@@ -7,7 +7,8 @@
 </head>
 
 <body>
-<!-- HEADER -->
+
+<!-- ================= HEADER ================= -->
 <header class="bento-header">
   <button class="hamburger" onclick="toggleMenu()" aria-label="Menu">
     <span></span>
@@ -15,30 +16,48 @@
     <span></span>
   </button>
 
-  <h2 class="page-title" >MedBuddy Admin</h2>
+  <h2 class="page-title">MedBuddy Admin</h2>
+
   <a href="/admin/logout" class="logout-btn">Logout</a>
 </header>
 
-<!-- SIDE PANEL -->
-<aside id="sidePanel" class="side-panel">
+<!-- ================= SIDE PANEL ================= -->
+<div id="sidePanel" class="side-panel">
   <h3>Doctor Settings</h3>
 
   <form method="post" action="/admin/settings">
-    <label>WhatsApp Number</label>
+
+    <label>Doctor WhatsApp</label>
     <input name="doctor_whatsapp"
-           value="{{ settings.doctor_whatsapp }}">
+           value="{{ settings.doctor_whatsapp }}"
+           placeholder="91XXXXXXXXXX">
+
+    <label>Consultation Fee (₹)</label>
+    <input
+  type="number"
+  name="default_amount"
+  value="{{ settings.default_amount }}"
+  placeholder="500">
+
 
     <label>UPI ID / Payment Link</label>
     <input name="upi_link"
-           value="{{ settings.upi_link }}">
+           value="{{ settings.upi_link }}"
+           placeholder="9588460141@ybl">
 
-    <button type="submit">Save</button>
+    <label>Default Meeting Link</label>
+    <input name="default_meeting_link"
+           value="{{ settings.default_meeting_link }}"
+           placeholder="https://meet.google.com/...">
+
+    <button type="submit">Save Settings</button>
   </form>
-</aside>
+</div>
 
-<!-- MAIN DASHBOARD -->
+<!-- ================= MAIN ================= -->
 <main class="dashboard">
-  <!-- STATS BENTO -->
+
+  <!-- ================= STATS ================= -->
   <section class="stats-bento">
     <div class="stat-card total">
       <span>Total</span>
@@ -61,10 +80,10 @@
     </div>
   </section>
 
-
-  <!-- FILTER BAR -->
+  <!-- ================= FILTER BAR ================= -->
   <section class="bento filter-bar">
     <form method="get" class="filter-form">
+
       <input name="search"
              placeholder="Search name / mobile / code"
              value="{{ search or '' }}">
@@ -74,27 +93,36 @@
 
       <select name="status">
         <option value="">All</option>
-        <option value="RESERVED">Reserved</option>
-        <option value="CONFIRMED">Confirmed</option>
-        <option value="CANCELLED">Cancelled</option>
-        <option value="DONE">Done</option>
+        <option value="RESERVED" {% if status_filter=="RESERVED" %}selected{% endif %}>Reserved</option>
+        <option value="CONFIRMED" {% if status_filter=="CONFIRMED" %}selected{% endif %}>Confirmed</option>
+        <option value="CANCELLED" {% if status_filter=="CANCELLED" %}selected{% endif %}>Cancelled</option>
+        <option value="DONE" {% if status_filter=="DONE" %}selected{% endif %}>Done</option>
       </select>
 
       <button>Apply</button>
     </form>
   </section>
 
-  <!-- APPOINTMENTS -->
+  <!-- ================= APPOINTMENTS ================= -->
   <section class="bento appointments-box">
     <h3>Appointments</h3>
 
     <div class="appointments-scroll">
       {% for a in appointments %}
+
+      {% set meet =
+         a.meeting_link
+         if a.meeting_link
+         else settings.default_meeting_link
+         if settings.default_meeting_link
+         else 'Will be shared soon'
+      %}
+
       <div class="appointment-card">
 
         <div class="card-top">
           <div>
-            <strong>{{ a.patient_name }}</strong>
+            <strong>{{ a.patient_name }}</strong><br>
             <small>{{ a.mobile }}</small>
           </div>
 
@@ -103,18 +131,20 @@
 
         <div class="card-mid">
           {{ a.appointment_date }} • {{ a.slot_time }}<br>
-          <small>{{ a.confirmation_code }}</small>
+          <small class="code">{{ a.confirmation_code }}</small>
         </div>
 
         <form method="post" action="/admin/update/{{ a.id }}">
+
           <textarea name="remarks"
                     placeholder="Internal notes">{{ a.admin_remarks or '' }}</textarea>
 
           <input name="meeting_link"
-                 placeholder="Meeting link"
+                 placeholder="Meeting link (optional)"
                  value="{{ a.meeting_link or '' }}">
 
           <div class="card-actions">
+
             <select name="status">
               <option value="RESERVED" {% if a.status=="RESERVED" %}selected{% endif %}>RESERVED</option>
               <option value="CONFIRMED" {% if a.status=="CONFIRMED" %}selected{% endif %}>CONFIRMED</option>
@@ -122,41 +152,45 @@
               <option value="DONE" {% if a.status=="DONE" %}selected{% endif %}>DONE</option>
             </select>
 
-            <button>Update</button>
+            <button type="submit">Update</button>
 
             {% if a.status == "RESERVED" %}
             <a class="wa-btn" target="_blank"
-               href="https://wa.me/{{ a.mobile }}?text={{ settings.reservation_message
-               .replace('{{name}}', a.patient_name)
-               .replace('{{date}}', a.appointment_date)
-               .replace('{{time}}', a.slot_time)
-               .replace('{{upi}}', settings.upi_link)
-               | urlencode }}">
-              💰 Payment
-            </a>
+   href="https://wa.me/{{ a.mobile }}?text={{ settings.reservation_message
+     .replace('{{name}}', a.patient_name)
+     .replace('{{date}}', a.appointment_date)
+     .replace('{{time}}', a.slot_time)
+     .replace('{{amount}}', settings.default_amount|string)
+     .replace('{{upi}}', settings.upi_link)
+     | urlencode }}">
+  Payment Message
+</a>
+
             {% endif %}
 
             {% if a.status == "CONFIRMED" %}
             <a class="wa-btn" target="_blank"
-               href="https://wa.me/{{ a.mobile }}?text={{ confirmation_message
-               .replace('{{name}}', a.patient_name)
-               .replace('{{code}}', a.confirmation_code)
-               .replace('{{date}}', a.appointment_date)
-               .replace('{{time}}', a.slot_time)
-               .replace('{{meeting_link}}', a.meeting_link)
-               | urlencode }}">
+               href="https://wa.me/{{ a.mobile }}?text={{ settings.confirmation_message
+                 .replace('{{name}}', a.patient_name)
+                 .replace('{{code}}', a.confirmation_code)
+                 .replace('{{date}}', a.appointment_date)
+                 .replace('{{time}}', a.slot_time)
+                 .replace('{{meeting_link}}', meet)
+                 .replace('{{receipt_link}}',
+                   request.url_root ~ 'appointment/pdf/' ~ a.confirmation_code)
+                 | urlencode }}">
               📲 Confirm
             </a>
             {% endif %}
+
           </div>
         </form>
-
       </div>
       {% endfor %}
     </div>
   </section>
 
-  <!-- SLOTS -->
+  <!-- ================= SLOTS ================= -->
   <section class="bento slots-box">
     <h3>Slots</h3>
 
@@ -180,7 +214,7 @@
 
 </main>
 
-<!-- JS -->
+<!-- ================= JS ================= -->
 <script>
 function toggleMenu() {
   document.getElementById("sidePanel").classList.toggle("open");

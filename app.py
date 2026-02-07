@@ -336,14 +336,25 @@ def admin_settings():
 
     f = request.form
     conn = db()
+
     conn.execute("""
-        UPDATE admin_settings
-        SET doctor_whatsapp=?, upi_link=?
-        WHERE id=1
-    """, (f["doctor_whatsapp"], f["upi_link"]))
+    UPDATE admin_settings
+    SET doctor_whatsapp = ?,
+        upi_link = ?,
+        default_amount = ?
+    WHERE id = 1
+""", (
+    f["doctor_whatsapp"],
+    f["upi_link"],
+    f["default_amount"]
+))
+
+
     conn.commit()
     conn.close()
+
     return redirect("/admin/dashboard")
+
 
 @app.route("/admin/logout")
 def admin_logout():
