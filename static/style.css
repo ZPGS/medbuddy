@@ -158,15 +158,17 @@ body {
 /* -------- TESTIMONIALS -------- */
 .testimonials {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  margin-top: 30px;
 }
 
-.card {
+.testimonials .card {
   background: white;
-  padding: 20px;
-  border-radius: 6px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+  text-align: center;
 }
 
 /* -------- FORMS -------- */
@@ -922,5 +924,41 @@ button {
 .page-title {
   text-align: center;
   margin: 30px 0 20px;
+}
+/* FULL PAGE LAYOUT */
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* MAIN CONTENT */
+main.content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* LOGIN CARD */
+.login-card {
+  width: 100%;
+  max-width: 520px;     /* 👈 bigger card */
+  padding: 32px 36px;   /* 👈 more breathing space */
+  border-radius: 12px;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.08);
+}
+
+/* INPUTS */
+.login-card input {
+  font-size: 16px;
+  padding: 14px;
+}
+
+/* BUTTON */
+.login-card button {
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 600;
 }
 

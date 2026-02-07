@@ -1,20 +1,29 @@
 <!doctype html>
 <html>
-  <head>
-    <title>Admin Login</title>
-    <link rel="stylesheet" href="/static/style.css" />
-  </head>
-  <body>
-    <header>
-      <h2>Admin Login</h2>
-    </header>
+<head>
+  <title>Admin Login</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
 
-    <div class="container">
-      <form method="post">
-        <input name="username" type="text" placeholder="Admin Username" />
-        <input name="password" type="password" placeholder="Admin Password" />
-        <button>Login</button>
-      </form>
-    </div>
-  </body>
+<body>
+
+<header>
+  <h2 class="page-title">Admin Login</h2>
+</header>
+
+<main class="content">
+  <div class="container login-card">
+    <form method="post">
+      <input name="username" type="text" placeholder="Admin Username" required>
+      <input name="password" type="password" placeholder="Admin Password" required>
+      <button type="submit">Login</button>
+    </form>
+  </div>
+</main>
+
+<footer class="footer">
+  © 2026 Sangamkripa HomeoCare • Online Homeopathy Consultation
+</footer>
+
+</body>
 </html>
