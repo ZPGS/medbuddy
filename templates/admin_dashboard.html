@@ -1,0 +1,143 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <header>
+      <h2>Admin Dashboard</h2>
+      <a href="/admin/logout" style="color: white">Logout</a>
+    </header>
+
+    <div class="container">
+      <!-- SETTINGS -->
+      <h3>Doctor WhatsApp & Payment</h3>
+      <form method="post" action="/admin/settings">
+        <input
+          name="doctor_whatsapp"
+          placeholder="Doctor WhatsApp Number"
+          value="{{ settings.doctor_whatsapp }}"
+        />
+        <input
+          name="upi_link"
+          placeholder="UPI Payment Link"
+          value="{{ settings.upi_link }}"
+        />
+        <button>Save</button>
+      </form>
+
+      <hr />
+
+      <!-- SLOT CREATION -->
+      <h3>Create Slot</h3>
+      <form method="post" action="/admin/slots" class="row">
+        <input type="date" name="slot_date" required />
+        <input type="time" name="start_time" required />
+        <input type="time" name="end_time" required />
+        <button>Add Slot</button>
+      </form>
+
+      <h3>All Slots</h3>
+      <table>
+        <tr>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Status</th>
+        </tr>
+        {% for s in slots %}
+        <tr>
+          <td>{{ s.slot_date }}</td>
+          <td>{{ s.start_time }} - {{ s.end_time }}</td>
+          <td>{{ "BOOKED" if s.is_booked else "FREE" }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+
+      <hr />
+
+      <!-- APPOINTMENTS -->
+      <h3>Appointments</h3>
+      <table>
+        <tr>
+          <th>Patient</th>
+          <th>Contact</th>
+          <th>Slot</th>
+          <th>Status</th>
+          <th>Remarks</th>
+          <th>Meeting</th>
+          <th>Action</th>
+        </tr>
+
+        {% for a in appointments %}
+        <tr>
+          <td>{{ a.patient_name }}</td>
+          <td>{{ a.mobile }}</td>
+          <td>{{ a.appointment_date }}<br />{{ a.slot_time }}</td>
+          <td class="status {{ a.status }}">{{ a.status }}</td>
+
+          <!-- UPDATE FORM -->
+          <td colspan="3">
+            <form method="post" action="/admin/update/{{ a.id }}">
+              <textarea name="remarks" placeholder="Internal remarks">
+{{ a.admin_remarks or '' }}</textarea
+              >
+
+              <input
+                name="meeting_link"
+                placeholder="Meeting link"
+                value="{{ a.meeting_link or '' }}"
+              />
+<select name="status">
+  <option value="RESERVED" {% if a.status == "RESERVED" %}selected{% endif %}>RESERVED</option>
+  <option value="CONFIRMED" {% if a.status == "CONFIRMED" %}selected{% endif %}>CONFIRMED</option>
+  <option value="CANCELLED" {% if a.status == "CANCELLED" %}selected{% endif %}>CANCELLED</option>
+  <option value="DONE" {% if a.status == "DONE" %}selected{% endif %}>DONE</option>
+</select>
+
+              <button type="submit">Update</button>
+            </form>
+
+            <!-- WHATSAPP FOR RESERVED (PAYMENT REQUEST) -->
+            {% if a.status == "RESERVED" %}
+            <br />
+            <a
+              class="wa-btn"
+              target="_blank"
+              href="https://wa.me/{{ a.mobile }}?text={{ settings.reservation_message
+             .replace('{{name}}', a.patient_name)
+             .replace('{{date}}', a.appointment_date)
+             .replace('{{time}}', a.slot_time)
+             .replace('{{upi}}', settings.upi_link)
+             | urlencode }}"
+            >
+              📩 Send Payment Request
+            </a>
+            {% endif %}
+
+            <!-- WHATSAPP FOR CONFIRMED (MEETING + RECEIPT) -->
+            {% if a.status == "CONFIRMED" %}
+            <br />
+            <a
+              class="wa-btn"
+              target="_blank"
+              href="https://wa.me/{{ a.mobile }}?text={{ confirmation_message
+             .replace('{{name}}', a.patient_name)
+             .replace('{{code}}', a.confirmation_code)
+             .replace('{{date}}', a.appointment_date)
+             .replace('{{time}}', a.slot_time)
+             .replace('{{meeting_link}}', a.meeting_link or 'Will be shared soon')
+             .replace('{{receipt_link}}',
+               request.url_root ~ 'appointment/pdf/' ~ a.confirmation_code)
+             | urlencode }}"
+            >
+              ✅ Send Confirmation & Receipt
+            </a>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Appointment History</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <header>
+      <h2>Appointment History</h2>
+    </header>
+
+    <div class="container">
+      <form method="post">
+        <input name="mobile" placeholder="Enter Mobile Number" required />
+        <button>View History</button>
+      </form>
+
+      {% if appointments %}
+      <h3>Your Appointments</h3>
+
+      <table>
+        <tr>
+          <th>Confirmation</th>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+
+        {% for a in appointments %}
+        <tr>
+          <td>{{ a.confirmation_code }}</td>
+          <td>{{ a.appointment_date }}</td>
+          <td>{{ a.slot_time }}</td>
+          <td class="status {{ a.status }}">{{ a.status }}</td>
+          <td>
+            <a href="/appointment/pdf/{{ a.confirmation_code }}">PDF</a>
+
+            {% if a.status == "RESERVED" %}
+            <form
+              method="post"
+              action="/cancel/{{ a.confirmation_code }}"
+              style="display: inline"
+              onsubmit="return confirm('Cancel appointment?');"
+            >
+              <button style="background: red">Cancel</button>
+            </form>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+      {% endif %}
+    </div>
+  </body>
+</html>

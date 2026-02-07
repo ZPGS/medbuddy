@@ -1,0 +1,278 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Segoe UI", Arial, sans-serif;
+  margin: 0;
+  background: #f4f7f6;
+  color: #333;
+}
+
+/* -------- HERO -------- */
+.hero {
+  background: linear-gradient(120deg, #1e8449, #27ae60);
+  color: white;
+  padding: 80px 20px;
+  text-align: center;
+}
+
+.hero h1 {
+  font-size: 42px;
+  margin-bottom: 10px;
+}
+
+.hero p {
+  font-size: 18px;
+  opacity: 0.9;
+}
+
+.cta {
+  margin-top: 30px;
+}
+
+.btn {
+  padding: 12px 24px;
+  text-decoration: none;
+  border-radius: 4px;
+  margin: 5px;
+  display: inline-block;
+  font-weight: bold;
+}
+
+.primary {
+  background: white;
+  color: #1e8449;
+}
+
+.secondary {
+  border: 2px solid white;
+  color: white;
+}
+
+/* -------- SECTIONS -------- */
+.section {
+  padding: 60px 20px;
+  max-width: 1100px;
+  margin: auto;
+}
+
+.section h2 {
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 32px;
+}
+
+.light {
+  background: #eef6f1;
+}
+
+.center-text {
+  text-align: center;
+}
+
+/* -------- STEPS -------- */
+.steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.step {
+  background: white;
+  padding: 20px;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.step span {
+  font-size: 32px;
+  font-weight: bold;
+  color: #1e8449;
+}
+
+/* -------- TESTIMONIALS -------- */
+.testimonials {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* -------- FORMS -------- */
+.container {
+  background: white;
+  padding: 20px;
+  border-radius: 6px;
+  max-width: 900px;
+  margin: 30px auto;
+}
+
+input,
+textarea,
+select,
+button {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+}
+
+button {
+  background: #1e8449;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+/* -------- TABLES -------- */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+th {
+  background: #1e8449;
+  color: white;
+}
+
+/* -------- STATUS -------- */
+.status {
+  font-weight: bold;
+}
+
+.RESERVED {
+  color: orange;
+}
+.CONFIRMED {
+  color: green;
+}
+.CANCELLED {
+  color: red;
+}
+.DONE {
+  color: blue;
+}
+
+/* -------- FOOTER -------- */
+footer {
+  text-align: center;
+  padding: 20px;
+  background: #1e8449;
+  color: white;
+  margin-top: 40px;
+}
+
+/* -------- FLASH -------- */
+.flash.info {
+  background: #dff0d8;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+}
+/* -------- ANIMATIONS -------- */
+.fade-in {
+  animation: fadeIn 1s ease-in;
+}
+
+.slide-up {
+  animation: slideUp 0.8s ease forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(40px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* -------- DOCTOR PROFILE -------- */
+.doctor-profile {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 20px;
+  align-items: center;
+}
+
+.doctor-profile img {
+  width: 180px;
+  border-radius: 50%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* -------- GALLERY -------- */
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 15px;
+}
+
+.gallery img {
+  width: 100%;
+  border-radius: 6px;
+  transition: transform 0.3s;
+}
+
+.gallery img:hover {
+  transform: scale(1.05);
+}
+
+/* -------- HOVER CARDS -------- */
+.hover-card {
+  transition:
+    transform 0.3s,
+    box-shadow 0.3s;
+}
+
+.hover-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* -------- WHATSAPP FLOAT -------- */
+.whatsapp-float {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  background: #25d366;
+  color: white;
+  font-size: 26px;
+  padding: 14px 16px;
+  border-radius: 50%;
+  text-decoration: none;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+  z-index: 999;
+}
+.wa-btn {
+  display: inline-block;
+  background: #25D366;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: bold;
+}

@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Appointment Status</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <header>
+      <h2>Check Appointment Status</h2>
+    </header>
+
+    <div class="container">
+      <form method="post">
+        <input
+          name="confirmation_code"
+          placeholder="Enter Confirmation Number"
+          required
+        />
+        <button>Check Status</button>
+      </form>
+
+      {% if appointment %}
+      <h3>Appointment Details</h3>
+
+      <table>
+        <tr>
+          <th>Confirmation No</th>
+          <td>{{ appointment.confirmation_code }}</td>
+        </tr>
+        <tr>
+          <th>Name</th>
+          <td>{{ appointment.patient_name }}</td>
+        </tr>
+        <tr>
+          <th>Mobile</th>
+          <td>{{ appointment.mobile }}</td>
+        </tr>
+        <tr>
+          <th>Date</th>
+          <td>{{ appointment.appointment_date }}</td>
+        </tr>
+        <tr>
+          <th>Time</th>
+          <td>{{ appointment.slot_time }}</td>
+        </tr>
+        <tr>
+          <th>Status</th>
+          <td class="status {{ appointment.status }}">
+            {{ appointment.status }}
+          </td>
+        </tr>
+      </table>
+
+      {% if appointment.status == "RESERVED" %}
+      <form
+        method="post"
+        action="/cancel/{{ appointment.confirmation_code }}"
+        onsubmit="return confirm('Cancel this appointment?');"
+      >
+        <button style="background: red">Cancel Appointment</button>
+      </form>
+      {% endif %} {% endif %}
+    </div>
+  </body>
+</html>

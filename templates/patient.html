@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Book Appointment</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <header>
+      <h2>Book Homeopathy Consultation</h2>
+    </header>
+
+    <div class="container">
+      {% with messages = get_flashed_messages(with_categories=true) %} {% if
+      messages %} {% for category, msg in messages %}
+      <p class="flash {{ category }}">{{ msg }}</p>
+      {% endfor %} {% endif %} {% endwith %}
+
+      <h3>Patient Details</h3>
+      <form method="post" action="/book">
+        <input name="patient_name" placeholder="Full Name" required />
+        <input name="mobile" placeholder="Mobile Number" required />
+        <textarea
+          name="address"
+          placeholder="Postal Address"
+          required
+        ></textarea>
+
+        <h3>Select Available Slot</h3>
+        <select name="slot_id" id="slotSelect" required>
+          <option value="">Loading slots...</option>
+        </select>
+
+        <button type="submit">Reserve Appointment</button>
+      </form>
+    </div>
+
+    <script>
+      fetch("/slots")
+        .then((r) => r.json())
+        .then((slots) => {
+          const sel = document.getElementById("slotSelect");
+          sel.innerHTML = "<option value=''>Select Slot</option>";
+          slots.forEach((s) => {
+            sel.innerHTML += `
+        <option value="${s.id}">
+          ${s.slot_date} | ${s.start_time} - ${s.end_time}
+        </option>`;
+          });
+        });
+    </script>
+  </body>
+</html>
