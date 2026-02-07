@@ -47,6 +47,13 @@
         </option>`;
           });
         });
+        
+  let autoRefresh = setInterval(() => {
+    if (!document.activeElement.matches("input, textarea, select")) {
+      window.location.reload();
+    }
+  }, 30000); // 30 seconds
+
     </script>
   </body>
 </html>

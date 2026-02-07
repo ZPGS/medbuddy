@@ -218,6 +218,11 @@
 function toggleMenu() {
   document.getElementById("sidePanel").classList.toggle("open");
 }
+  let autoRefresh = setInterval(() => {
+    if (!document.activeElement.matches("input, textarea, select")) {
+      window.location.reload();
+    }
+  }, 30000); // 30 seconds
 </script>
 <footer>© 2026 Dr. HomeoCare • Online Homeopathy Consultation</footer>
 </body>

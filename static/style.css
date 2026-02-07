@@ -962,3 +962,32 @@ main.content {
   font-weight: 600;
 }
 
+/* ================== TESTIMONIALS FIX ================== */
+
+/* Break out of narrow .section */
+.testimonials-section {
+  max-width: 100% !important;
+}
+
+/* Center grid with full width */
+.testimonials {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+/* Tablet */
+@media (max-width: 900px) {
+  .testimonials {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .testimonials {
+    grid-template-columns: 1fr;
+  }
+}
