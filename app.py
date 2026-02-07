@@ -354,7 +354,16 @@ def admin_settings():
     conn.close()
 
     return redirect("/admin/dashboard")
-
+@app.route("/admin", methods=["GET", "POST"])
+def admin_login():
+    if request.method == "POST":
+        f = request.form
+        if f["username"] == "admin" and f["password"] == "admin123":
+            session["admin"] = True
+            return redirect("/admin/dashboard")
+        else:
+            flash("Invalid credentials", "error")
+    return render_template("admin_login.html")
 
 @app.route("/admin/logout")
 def admin_logout():
