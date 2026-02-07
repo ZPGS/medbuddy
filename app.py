@@ -210,24 +210,69 @@ def appointment_pdf(code):
 # =================================================
 # ADMIN
 # =================================================
-@app.route("/admin", methods=["GET", "POST"])
-def admin_login():
-    if request.method == "POST" and request.form["password"] == "admin123":
-        session["admin"] = True
-        return redirect("/admin/dashboard")
-    return render_template("admin_login.html")
-
 @app.route("/admin/dashboard")
 def admin_dashboard():
     if not session.get("admin"):
         return redirect("/admin")
 
+    search = request.args.get("search", "").strip()
+    status_filter = request.args.get("status", "").strip()
+    from_date = request.args.get("from_date", "").strip()
+    to_date = request.args.get("to_date", "").strip()
+
     conn = db()
 
-    apps = conn.execute(
-        "SELECT * FROM appointments ORDER BY created_at DESC"
-    ).fetchall()
+    # ---------------- QUERY BUILD ----------------
+    query = "SELECT * FROM appointments WHERE 1=1"
+    params = []
 
+    if search:
+        query += """
+        AND (
+            patient_name LIKE ?
+            OR mobile LIKE ?
+            OR confirmation_code LIKE ?
+        )
+        """
+        like = f"%{search}%"
+        params.extend([like, like, like])
+
+    if status_filter:
+        query += " AND status = ?"
+        params.append(status_filter)
+
+    if from_date:
+        query += " AND appointment_date >= ?"
+        params.append(from_date)
+
+    if to_date:
+        query += " AND appointment_date <= ?"
+        params.append(to_date)
+
+    query += " ORDER BY appointment_date DESC, slot_time ASC"
+
+    appointments = conn.execute(query, params).fetchall()
+
+    # ---------------- STATS ----------------
+    stats = {
+        "total": conn.execute(
+            "SELECT COUNT(*) FROM appointments"
+        ).fetchone()[0],
+
+        "reserved": conn.execute(
+            "SELECT COUNT(*) FROM appointments WHERE status='RESERVED'"
+        ).fetchone()[0],
+
+        "confirmed": conn.execute(
+            "SELECT COUNT(*) FROM appointments WHERE status='CONFIRMED'"
+        ).fetchone()[0],
+
+        "today": conn.execute(
+            "SELECT COUNT(*) FROM appointments WHERE appointment_date = DATE('now')"
+        ).fetchone()[0],
+    }
+
+    # ---------------- OTHER DATA ----------------
     slots = conn.execute(
         "SELECT * FROM slots ORDER BY slot_date, start_time"
     ).fetchall()
@@ -240,11 +285,17 @@ def admin_dashboard():
 
     return render_template(
         "admin_dashboard.html",
-        appointments=apps,
+        appointments=appointments,
         slots=slots,
         settings=settings,
-        confirmation_message=settings["confirmation_message"]
+        confirmation_message=settings["confirmation_message"],
+        stats=stats,
+        search=search,
+        status_filter=status_filter,
+        from_date=from_date,
+        to_date=to_date
     )
+
 
 @app.route("/admin/slots", methods=["POST"])
 def add_slot():

@@ -1,0 +1,142 @@
+the stats are not visually appealing as were in <!doctype html>
+<html>
+<head>
+  <title>MedBuddy Admin</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+
+<!-- HEADER -->
+<header class="topbar">
+  <div class="left">
+    <button class="hamburger" onclick="toggleMenu()">☰</button>
+    <h2>MedBuddy Admin</h2>
+  </div>
+  <a href="/admin/logout" class="logout">Logout</a>
+</header>
+
+<!-- HAMBURGER PANEL -->
+<div id="sidePanel" class="side-panel">
+  <h3>Doctor Settings</h3>
+  <form method="post" action="/admin/settings">
+    <label>WhatsApp Number</label>
+    <input name="doctor_whatsapp" value="{{ settings.doctor_whatsapp }}">
+    <label>UPI Payment ID</label>
+    <input name="upi_link" value="{{ settings.upi_link }}">
+    <button type="submit">Save</button>
+  </form>
+</div>
+
+<!-- MAIN -->
+<main class="dashboard">
+
+  <!-- STATS BENTO -->
+  <section class="stats-bento">
+    <div class="stat-card total">
+      <span>Total</span>
+      <h1>{{ stats.total }}</h1>
+    </div>
+
+    <div class="stat-card reserved">
+      <span>Reserved</span>
+      <h1>{{ stats.reserved }}</h1>
+    </div>
+
+    <div class="stat-card confirmed">
+      <span>Confirmed</span>
+      <h1>{{ stats.confirmed }}</h1>
+    </div>
+
+    <div class="stat-card today">
+      <span>Today</span>
+      <h1>{{ stats.today }}</h1>
+    </div>
+  </section>
+
+  <!-- SEARCH + FILTER -->
+  <section class="filter-bar">
+    <form method="get">
+      <input name="search" placeholder="Search name / mobile / code"
+             value="{{ search or '' }}">
+
+      <input type="date" name="from_date" value="{{ from_date or '' }}">
+      <input type="date" name="to_date" value="{{ to_date or '' }}">
+
+      <select name="status">
+        <option value="">All</option>
+        <option value="RESERVED" {% if status_filter=="RESERVED" %}selected{% endif %}>Reserved</option>
+        <option value="CONFIRMED" {% if status_filter=="CONFIRMED" %}selected{% endif %}>Confirmed</option>
+        <option value="CANCELLED" {% if status_filter=="CANCELLED" %}selected{% endif %}>Cancelled</option>
+        <option value="DONE" {% if status_filter=="DONE" %}selected{% endif %}>Done</option>
+      </select>
+
+      <button>Filter</button>
+    </form>
+  </section>
+
+  <!-- APPOINTMENTS -->
+  <section class="appointments-box">
+    <h3>Appointments</h3>
+
+    <div class="appointments-scroll">
+      {% for a in appointments %}
+      <div class="appointment-card">
+
+        <div class="card-header">
+          <div>
+            <strong>{{ a.patient_name }}</strong>
+            <small>{{ a.mobile }}</small>
+          </div>
+          <span class="status {{ a.status }}">{{ a.status }}</span>
+        </div>
+
+        <div class="card-body">
+          <div>{{ a.appointment_date }} • {{ a.slot_time }}</div>
+          <small>{{ a.confirmation_code }}</small>
+        </div>
+
+        <form method="post" action="/admin/update/{{ a.id }}">
+          <textarea name="remarks" placeholder="Internal notes">{{ a.admin_remarks or '' }}</textarea>
+          <input name="meeting_link" placeholder="Meeting link" value="{{ a.meeting_link or '' }}">
+
+          <div class="card-actions">
+            <select name="status">
+              <option value="RESERVED" {% if a.status=="RESERVED" %}selected{% endif %}>RESERVED</option>
+              <option value="CONFIRMED" {% if a.status=="CONFIRMED" %}selected{% endif %}>CONFIRMED</option>
+              <option value="CANCELLED" {% if a.status=="CANCELLED" %}selected{% endif %}>CANCELLED</option>
+              <option value="DONE" {% if a.status=="DONE" %}selected{% endif %}>DONE</option>
+            </select>
+
+            <button>Update</button>
+
+            {% if a.status=="RESERVED" %}
+            <a class="wa-btn" target="_blank"
+               href="https://wa.me/{{ a.mobile }}?text={{ settings.reservation_message
+               .replace('{{name}}', a.patient_name)
+               .replace('{{date}}', a.appointment_date)
+               .replace('{{time}}', a.slot_time)
+               .replace('{{upi}}', settings.upi_link)
+               | urlencode }}">
+              Payment
+            </a>
+            {% endif %}
+          </div>
+        </form>
+
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+</main>
+
+<script>
+function toggleMenu() {
+  document.getElementById("sidePanel").classList.toggle("open");
+}
+</script>
+
+</body>
+</html>
