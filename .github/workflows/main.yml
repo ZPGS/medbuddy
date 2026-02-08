@@ -2,7 +2,7 @@ name: Keep Render Awake
 
 on:
   schedule:
-    - cron: "*/25 * * * * *"  # Runs every 5 minutes
+    - cron: "*/5 * * * *"  # Runs every 5 minutes
   workflow_dispatch:  # Allow manual run
 
 jobs:
@@ -14,5 +14,3 @@ jobs:
         run: |
           echo "Pinging Render instance..."
           curl -s -o /dev/null -w "%{http_code}\n" https://sangamkripahomeocare.onrender.com/
-          
-          
