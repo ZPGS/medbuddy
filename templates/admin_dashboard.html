@@ -9,8 +9,16 @@
 <body>
 
 <!-- ================= HEADER ================= -->
-<header class="bento-header">
-  <h2 class="page-title">Admin Dashboard</h2>
+<header class="admin-header">
+  <div class="header-left">
+    <button class="menu-btn" onclick="toggleMenu()" aria-label="Menu">☰</button>
+  </div>
+
+  <div class="header-center">
+    Admin Dashboard
+  </div>
+
+  <div class="header-right"></div>
 </header>
 
 
@@ -109,8 +117,8 @@
 
       <select name="consultation_type">
         <option value="">All Types</option>
-        <option value="first">First Consult</option>
-        <option value="followup">Follow-up</option>
+        <option value="FIRST">First Consult</option>
+        <option value="FOLLOWUP">Follow-up</option>
       </select>
 
       <button type="submit">Apply</button>
@@ -161,7 +169,8 @@
           {{ a.appointment_date }} • {{ a.slot_time }}<br>
           <small class="code">{{ a.confirmation_code }}</small><br>
           <small class="muted">
-            {{ "Follow-up" if a.consultation_type=="followup" else "First Consultation" }}
+           {{ "Follow-up" if a.consultation_type=="FOLLOWUP" else "First Consultation" }}
+
             • ₹{{ fee }}
           </small>
         </div>

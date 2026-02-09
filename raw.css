@@ -450,7 +450,13 @@ footer {
   }
 }
 /* -------- RESPONSIVE -------- */
-
+.bento-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 16px 24px;
+  background: white;
+  border-bottom: 1px solid #eee;
+}
 
 .bento-grid {
   display: grid;
@@ -593,6 +599,12 @@ footer {
   gap: 12px;
 }
 
+.hamburger {
+  font-size: 22px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
 
 .logout {
   text-decoration: none;
@@ -987,7 +999,10 @@ button {
     font-size: 32px;
   }
 }
-
+.page-title {
+  text-align: center;
+  margin: 30px 0 20px;
+}
 /* FULL PAGE LAYOUT */
 body {
   min-height: 100vh;
@@ -1169,52 +1184,47 @@ main.content {
   color: #1e7e34;
 }
 
-/* ================= ADMIN HEADER – FINAL FIX ================= */
-
+/* ================= FIXED ADMIN HEADER ================= */
 .admin-header {
   position: sticky;
   top: 0;
   z-index: 9999;
 
   height: 60px;
-  background: #fbfdfb;
-  color: #161515;
+  width: 100%;
 
-  display: grid;
-  grid-template-columns: 60px 1fr 60px;
+  background-color: #2e7d32; /* solid green */
+  color: #ffffff;
+
+  display: flex;
   align-items: center;
+  justify-content: center;
 
   box-shadow: 0 2px 6px rgba(0,0,0,0.15);
 }
 
-/* LEFT */
-.header-left {
-  display: flex;
-  justify-content: center;
-}
-
-/* CENTER */
-.header-center {
-  text-align: center;
+/* Centered title */
+.admin-header .header-title {
   font-size: 18px;
   font-weight: 600;
   letter-spacing: 0.3px;
 }
 
-/* RIGHT (EMPTY – balances layout) */
-.header-right {}
+/* Hamburger — pinned hard left */
+.admin-header .menu-btn {
+  position: absolute;
+  left: 16px;
 
-/* MENU BUTTON */
-.menu-btn {
   background: none;
   border: none;
-  color: #3fbc0d;
-  font-size: 20px;
+  color: #ffffff;
+
+  font-size: 22px;
   cursor: pointer;
   padding: 6px 8px;
   border-radius: 6px;
 }
 
-.menu-btn:hover {
+.admin-header .menu-btn:hover {
   background: rgba(255,255,255,0.15);
 }
