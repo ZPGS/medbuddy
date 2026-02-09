@@ -1,14 +1,15 @@
 import sqlite3
-from datetime import datetime
 
 DB = "medbuddy.db"
 
 conn = sqlite3.connect(DB)
 c = conn.cursor()
 
-# ---------------- SLOTS ----------------
+# =================================================
+# SLOTS
+# =================================================
 c.execute("""
-CREATE TABLE slots (
+CREATE TABLE IF NOT EXISTS slots (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     slot_date TEXT NOT NULL,
     start_time TEXT NOT NULL,
@@ -17,9 +18,11 @@ CREATE TABLE slots (
 )
 """)
 
-# ---------------- APPOINTMENTS ----------------
+# =================================================
+# APPOINTMENTS
+# =================================================
 c.execute("""
-CREATE TABLE appointments (
+CREATE TABLE IF NOT EXISTS appointments (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     confirmation_code TEXT UNIQUE,
 
@@ -31,6 +34,7 @@ CREATE TABLE appointments (
     appointment_date TEXT NOT NULL,
     slot_time TEXT NOT NULL,
 
+    consultation_type TEXT DEFAULT 'first',
     amount INTEGER NOT NULL DEFAULT 500,
     payment_ref TEXT,
 
@@ -45,13 +49,19 @@ CREATE TABLE appointments (
 )
 """)
 
-# ---------------- ADMIN SETTINGS ----------------
+# =================================================
+# ADMIN SETTINGS
+# =================================================
 c.execute("""
-CREATE TABLE admin_settings (
+CREATE TABLE IF NOT EXISTS admin_settings (
     id INTEGER PRIMARY KEY,
     doctor_whatsapp TEXT,
     upi_link TEXT,
+
     default_amount INTEGER,
+    followup_amount INTEGER,
+
+    default_meeting_link TEXT,
 
     reservation_message TEXT,
     confirmation_message TEXT,
@@ -59,14 +69,35 @@ CREATE TABLE admin_settings (
 )
 """)
 
-# ---------------- DEFAULT SETTINGS ----------------
+# =================================================
+# SAFE MIGRATIONS (ADD MISSING COLUMNS)
+# =================================================
+def column_exists(table, column):
+    c.execute(f"PRAGMA table_info({table})")
+    return column in [row[1] for row in c.fetchall()]
+
+# ---- appointments table ----
+if not column_exists("appointments", "consultation_type"):
+    c.execute("ALTER TABLE appointments ADD COLUMN consultation_type TEXT DEFAULT 'first'")
+
+# ---- admin_settings table ----
+if not column_exists("admin_settings", "followup_amount"):
+    c.execute("ALTER TABLE admin_settings ADD COLUMN followup_amount INTEGER DEFAULT 300")
+
+if not column_exists("admin_settings", "default_meeting_link"):
+    c.execute("ALTER TABLE admin_settings ADD COLUMN default_meeting_link TEXT")
+
+# =================================================
+# DEFAULT MESSAGE TEMPLATES
+# =================================================
 reservation_message = (
     "Hello {{name}},\n\n"
     "Your appointment has been RESERVED.\n\n"
     "📅 Date: {{date}}\n"
     "⏰ Time: {{time}}\n\n"
     "💰 Consultation Fee: ₹{{amount}}\n\n"
-    "Please complete the payment using the UPI link below and share the payment screenshot or transaction ID.\n\n"
+    "Please complete the payment using the UPI link below "
+    "and share the payment screenshot or transaction ID.\n\n"
     "🔗 Pay via UPI:\n"
     "upi://pay?pa={{upi}}&am={{amount}}&cu=INR\n\n"
     "UPI ID (manual):\n"
@@ -74,7 +105,6 @@ reservation_message = (
     "Thank you,\n"
     "Dr. Shweta Chandrakant Zungare"
 )
-
 
 confirmation_message = (
     "Hello {{name}},\n\n"
@@ -98,27 +128,36 @@ reminder_message = (
     "Dr. Shweta Chandrakant Zungare"
 )
 
-c.execute("""
-INSERT INTO admin_settings (
-    id,
-    doctor_whatsapp,
-    upi_link,
-    default_amount,
-    reservation_message,
-    confirmation_message,
-    reminder_message
-) VALUES (?, ?, ?, ?, ?, ?, ?)
-""", (
-    1,
-    "919588460141",
-    "9588460141@ybl",
-    500,
-    reservation_message,
-    confirmation_message,
-    reminder_message
-))
+# =================================================
+# INSERT DEFAULT SETTINGS (ONLY IF EMPTY)
+# =================================================
+c.execute("SELECT COUNT(*) FROM admin_settings")
+if c.fetchone()[0] == 0:
+    c.execute("""
+    INSERT INTO admin_settings (
+        id,
+        doctor_whatsapp,
+        upi_link,
+        default_amount,
+        followup_amount,
+        default_meeting_link,
+        reservation_message,
+        confirmation_message,
+        reminder_message
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, (
+        1,
+        "919588460141",
+        "9588460141@ybl",
+        500,
+        300,
+        "",
+        reservation_message,
+        confirmation_message,
+        reminder_message
+    ))
 
 conn.commit()
 conn.close()
 
-print("✅ Fresh database initialized successfully")
+print("✅ Database initialized & migrated successfully")

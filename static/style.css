@@ -64,6 +64,84 @@ body {
   display: inline-block;
   font-size: 13px;
 }
+/* ===== CONSULTATION TYPE BADGES ===== */
+.consult-badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  margin-right: 6px;
+  display: inline-block;
+}
+
+/* First Consultation */
+.consult-badge.FIRST {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+/* Follow-up Consultation */
+.consult-badge.FOLLOWUP {
+  background: #ede7f6;
+  color: #5e35b1;
+}
+
+/* Badge container */
+.badge-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+/* ===== COMMON PILL STYLE ===== */
+.pill {
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  display: inline-block;
+  text-transform: uppercase;
+}
+
+/* ===== STATUS PILLS ===== */
+.pill.status.reserved {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.pill.status.confirmed {
+  background: #d4edda;
+  color: #155724;
+}
+
+.pill.status.cancelled {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.pill.status.done {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+/* ===== CONSULTATION TYPE PILLS ===== */
+.pill.consult.first {
+  background: #e3f2fd;
+  color: #0d47a1;
+}
+
+.pill.consult.followup {
+  background: #ede7f6;
+  color: #4a148c;
+}
+
+/* ===== ALIGNMENT ===== */
+.badge-group {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+
 
 /* -------- BUTTON ROW -------- */
 .action-row {
@@ -990,4 +1068,118 @@ main.content {
   .testimonials {
     grid-template-columns: 1fr;
   }
+}
+/* ===== Toggle Switch ===== */
+.toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 12px 0 6px;
+  font-weight: 600;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 26px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background-color: #ccc;
+  transition: 0.3s;
+  border-radius: 26px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.3s;
+  border-radius: 50%;
+}
+
+.switch input:checked + .slider {
+  background-color: #1e8449;
+}
+
+.switch input:checked + .slider:before {
+  transform: translateX(22px);
+}
+
+.fee-note {
+  margin: 10px 0 20px;
+  font-size: 15px;
+}
+.danger-btn {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.danger-btn:hover {
+  background: #c0392b;
+}
+
+.danger-btn.small {
+  margin-top: 8px;
+  padding: 6px 10px;
+  font-size: 13px;
+}
+.bento-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* 👈 key fix */
+  padding: 16px 20px;
+  position: relative;
+}
+
+/* ===== HEADER FIX ===== */
+.bento-header {
+  position: relative;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  background: #ffffff;
+  border-bottom: 1px solid #eaeaea;
+}
+
+/* Hamburger — HARD LEFT */
+.hamburger {
+  position: absolute;
+  left: 20px;
+  font-size: 26px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #1e7e34;
+}
+
+/* Title — TRUE CENTER */
+.page-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #1e7e34;
 }

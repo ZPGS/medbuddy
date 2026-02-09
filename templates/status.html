@@ -1,65 +1,134 @@
 <!doctype html>
-<html>
-  <head>
-    <title>Appointment Status</title>
-    <link rel="stylesheet" href="/static/style.css" />
-  </head>
-  <body>
-    <header>
-      <h2 class="page-title">Check Appointment Status</h2>
-    </header>
+<html lang="en">
+<head>
+  <title>Appointment Status | Harmony HomeoCare</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
 
-    <div class="container">
-      <form method="post">
-        <input
-          name="confirmation_code"
-          placeholder="Enter Confirmation Number"
-          required
-        />
-        <button>Check Status</button>
-      </form>
+<body>
 
-      {% if appointment %}
-      <h3>Appointment Details</h3>
+<header>
+  <h2 class="page-title">Check Appointment Status</h2>
+</header>
 
-      <table>
-        <tr>
-          <th>Confirmation No</th>
-          <td>{{ appointment.confirmation_code }}</td>
-        </tr>
-        <tr>
-          <th>Name</th>
-          <td>{{ appointment.patient_name }}</td>
-        </tr>
-        <tr>
-          <th>Mobile</th>
-          <td>{{ appointment.mobile }}</td>
-        </tr>
-        <tr>
-          <th>Date</th>
-          <td>{{ appointment.appointment_date }}</td>
-        </tr>
-        <tr>
-          <th>Time</th>
-          <td>{{ appointment.slot_time }}</td>
-        </tr>
-        <tr>
-          <th>Status</th>
-          <td class="status {{ appointment.status }}">
+<main class="content">
+
+  <div class="container fade-in">
+
+    <!-- ================= STATUS FORM ================= -->
+    <form method="post">
+      <input
+        name="confirmation_code"
+        placeholder="Enter Confirmation Number (e.g. MB-20260207-0001)"
+        required>
+      <button type="submit">Check Status</button>
+    </form>
+
+    {% if appointment %}
+
+    <!-- ================= DETAILS ================= -->
+    <h3 style="margin-top: 30px;">Appointment Details</h3>
+
+    <table>
+      <tr>
+        <th>Confirmation No</th>
+        <td class="code">{{ appointment.confirmation_code }}</td>
+      </tr>
+
+      <tr>
+        <th>Patient Name</th>
+        <td>{{ appointment.patient_name }}</td>
+      </tr>
+
+      <tr>
+        <th>Mobile</th>
+        <td>{{ appointment.mobile }}</td>
+      </tr>
+
+      <tr>
+        <th>Date</th>
+        <td>{{ appointment.appointment_date }}</td>
+      </tr>
+
+      <tr>
+        <th>Time</th>
+        <td>{{ appointment.slot_time }}</td>
+      </tr>
+
+      <tr>
+        <th>Status</th>
+        <td>
+          <span class="status {{ appointment.status }}">
             {{ appointment.status }}
-          </td>
-        </tr>
-      </table>
+          </span>
+        </td>
+      </tr>
+    </table>
 
-      {% if appointment.status == "RESERVED" %}
+    <!-- ================= STATUS MESSAGES ================= -->
+    {% if appointment.status == "RESERVED" %}
+      <p class="muted" style="margin-top: 16px;">
+        ⏳ Your slot is temporarily reserved.  
+        Please complete payment to confirm your appointment.
+      </p>
+
       <form
         method="post"
         action="/cancel/{{ appointment.confirmation_code }}"
-        onsubmit="return confirm('Cancel this appointment?');"
-      >
-        <button style="background: red">Cancel Appointment</button>
+        onsubmit="return confirm('Are you sure you want to cancel this appointment?');">
+        <button style="background:#e74c3c;margin-top:10px;">
+          Cancel Appointment
+        </button>
       </form>
-      {% endif %} {% endif %}
-    </div>
-  </body>
+    {% endif %}
+
+    {% if appointment.status == "CONFIRMED" %}
+      <p class="muted" style="margin-top: 16px;">
+        ✅ Your appointment is confirmed.
+      </p>
+
+      <p>
+        <strong>Meeting Link:</strong><br>
+        {% if appointment.meeting_link %}
+          <a href="{{ appointment.meeting_link }}" target="_blank">
+            {{ appointment.meeting_link }}
+          </a>
+        {% else %}
+          Will be shared shortly via WhatsApp.
+        {% endif %}
+      </p>
+
+      <a class="wa-btn"
+         href="/appointment/pdf/{{ appointment.confirmation_code }}"
+         target="_blank"
+         style="margin-top:10px;">
+        📄 Download Receipt
+      </a>
+    {% endif %}
+
+    {% if appointment.status == "CANCELLED" %}
+      <p class="muted" style="margin-top: 16px;">
+        ❌ This appointment has been cancelled.
+      </p>
+    {% endif %}
+
+    {% if appointment.status == "DONE" %}
+      <p class="muted" style="margin-top: 16px;">
+        🩺 Consultation completed.  
+        Thank you for choosing Harmony HomeoCare.
+      </p>
+    {% endif %}
+
+    {% endif %}
+
+  </div>
+
+</main>
+
+<footer class="footer">
+  © 2026 Harmony  HomeoCare • Online Homeopathy Consultation
+</footer>
+
+</body>
 </html>

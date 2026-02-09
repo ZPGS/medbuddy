@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <title> SangamKripa HomeoCare </title>
+  <title>Harmony HomeoCare – Admin</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="/static/style.css">
 </head>
@@ -10,16 +10,9 @@
 
 <!-- ================= HEADER ================= -->
 <header class="bento-header">
-  <button class="hamburger" onclick="toggleMenu()" aria-label="Menu">
-    <span></span>
-    <span></span>
-    <span></span>
-  </button>
-
-  <h2 class="page-title">Admin</h2>
-
-  
+  <h2 class="page-title">Admin Dashboard</h2>
 </header>
+
 
 <!-- ================= SIDE PANEL ================= -->
 <div id="sidePanel" class="side-panel">
@@ -30,15 +23,19 @@
     <label>Doctor WhatsApp</label>
     <input name="doctor_whatsapp"
            value="{{ settings.doctor_whatsapp }}"
-           placeholder="91XXXXXXXXXX">
+           placeholder="919588460141">
 
-    <label>Consultation Fee (₹)</label>
-    <input
-  type="number"
-  name="default_amount"
-  value="{{ settings.default_amount }}"
-  placeholder="500">
+    <label>First Consultation Fee (₹)</label>
+    <input type="number"
+           name="default_amount"
+           value="{{ settings.default_amount }}"
+           placeholder="500">
 
+    <label>Follow-up Fee (₹)</label>
+    <input type="number"
+           name="followup_amount"
+           value="{{ settings.followup_amount }}"
+           placeholder="300">
 
     <label>UPI ID / Payment Link</label>
     <input name="upi_link"
@@ -51,12 +48,22 @@
            placeholder="https://meet.google.com/...">
 
     <button type="submit">Save Settings</button>
+
     <a href="/admin/logout" class="logout-btn">Logout</a>
   </form>
 </div>
 
 <!-- ================= MAIN ================= -->
 <main class="dashboard">
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% for category, msg in messages %}
+    {% if category.startswith('admin-') %}
+      <div class="flash {{ category }}">{{ msg }}</div>
+    {% endif %}
+  {% endfor %}
+{% endwith %}
+
 
   <!-- ================= STATS ================= -->
   <section class="stats-bento">
@@ -81,7 +88,7 @@
     </div>
   </section>
 
-  <!-- ================= FILTER BAR ================= -->
+  <!-- ================= FILTER ================= -->
   <section class="bento filter-bar">
     <form method="get" class="filter-form">
 
@@ -93,14 +100,20 @@
       <input type="date" name="to_date" value="{{ to_date or '' }}">
 
       <select name="status">
-        <option value="">All</option>
-        <option value="RESERVED" {% if status_filter=="RESERVED" %}selected{% endif %}>Reserved</option>
-        <option value="CONFIRMED" {% if status_filter=="CONFIRMED" %}selected{% endif %}>Confirmed</option>
-        <option value="CANCELLED" {% if status_filter=="CANCELLED" %}selected{% endif %}>Cancelled</option>
-        <option value="DONE" {% if status_filter=="DONE" %}selected{% endif %}>Done</option>
+        <option value="">All Status</option>
+        <option value="RESERVED">Reserved</option>
+        <option value="CONFIRMED">Confirmed</option>
+        <option value="CANCELLED">Cancelled</option>
+        <option value="DONE">Done</option>
       </select>
 
-      <button>Apply</button>
+      <select name="consultation_type">
+        <option value="">All Types</option>
+        <option value="first">First Consult</option>
+        <option value="followup">Follow-up</option>
+      </select>
+
+      <button type="submit">Apply</button>
     </form>
   </section>
 
@@ -111,30 +124,49 @@
     <div class="appointments-scroll">
       {% for a in appointments %}
 
+      {% set fee =
+        settings.followup_amount if a.consultation_type == 'followup'
+        else settings.default_amount
+      %}
+
       {% set meet =
-         a.meeting_link
-         if a.meeting_link
-         else settings.default_meeting_link
-         if settings.default_meeting_link
-         else 'Will be shared soon'
+        a.meeting_link
+        if a.meeting_link
+        else settings.default_meeting_link
+        if settings.default_meeting_link
+        else 'Will be shared soon'
       %}
 
       <div class="appointment-card">
 
         <div class="card-top">
-          <div>
-            <strong>{{ a.patient_name }}</strong><br>
-            <small>{{ a.mobile }}</small>
-          </div>
+  <div>
+    <strong>{{ a.patient_name }}</strong><br>
+    <small>{{ a.mobile }}</small>
+  </div>
 
-          <span class="status {{ a.status }}">{{ a.status }}</span>
-        </div>
+  <div class="badge-group">
+    <span class="consult-badge {{ a.consultation_type }}">
+      {{ a.consultation_type }}
+    </span>
+
+    <span class="status {{ a.status }}">
+      {{ a.status }}
+    </span>
+  </div>
+</div>
+
 
         <div class="card-mid">
           {{ a.appointment_date }} • {{ a.slot_time }}<br>
-          <small class="code">{{ a.confirmation_code }}</small>
+          <small class="code">{{ a.confirmation_code }}</small><br>
+          <small class="muted">
+            {{ "Follow-up" if a.consultation_type=="followup" else "First Consultation" }}
+            • ₹{{ fee }}
+          </small>
         </div>
 
+        <!-- UPDATE -->
         <form method="post" action="/admin/update/{{ a.id }}">
 
           <textarea name="remarks"
@@ -155,19 +187,20 @@
 
             <button type="submit">Update</button>
 
-            {% if a.status == "RESERVED" %}
-            <a class="wa-btn" target="_blank"
+           {% if a.status == "RESERVED" %}
+<a class="wa-btn" target="_blank"
    href="https://wa.me/{{ a.mobile }}?text={{ settings.reservation_message
      .replace('{{name}}', a.patient_name)
      .replace('{{date}}', a.appointment_date)
      .replace('{{time}}', a.slot_time)
-     .replace('{{amount}}', settings.default_amount|string)
+     .replace('{{amount}}', a.amount|string)
      .replace('{{upi}}', settings.upi_link)
      | urlencode }}">
-  Payment Message
+  💰 Payment Message
 </a>
+{% endif %}
 
-            {% endif %}
+
 
             {% if a.status == "CONFIRMED" %}
             <a class="wa-btn" target="_blank"
@@ -186,6 +219,18 @@
 
           </div>
         </form>
+
+        <!-- DELETE APPOINTMENT -->
+        <form method="post"
+      action="/admin/delete_appointment/{{ a.id }}"
+      onsubmit="return confirm('Delete this appointment permanently?');"
+      style="display:inline;">
+  <button type="submit" class="danger-btn">
+    🗑 Delete
+  </button>
+</form>
+
+
       </div>
       {% endfor %}
     </div>
@@ -199,32 +244,49 @@
       <input type="date" name="slot_date" required>
       <input type="time" name="start_time" required>
       <input type="time" name="end_time" required>
-      <button>Add Slot</button>
+      <button type="submit">Add Slot</button>
     </form>
 
     <div class="slots-grid">
       {% for s in slots %}
       <div class="slot-chip {{ 'booked' if s.is_booked }}">
+
         <strong>{{ s.slot_date }}</strong>
         <div>{{ s.start_time }} – {{ s.end_time }}</div>
         <small>{{ "BOOKED" if s.is_booked else "FREE" }}</small>
+
+        {% if not s.is_booked %}
+        <form method="post"
+              action="/admin/delete/slot/{{ s.id }}"
+              onsubmit="return confirm('Delete this slot?');">
+          <button class="danger-btn small">🗑 Delete</button>
+        </form>
+        {% endif %}
+
       </div>
       {% endfor %}
     </div>
   </section>
 
 </main>
+
 <!-- ================= JS ================= -->
 <script>
 function toggleMenu() {
   document.getElementById("sidePanel").classList.toggle("open");
 }
-  let autoRefresh = setInterval(() => {
-    if (!document.activeElement.matches("input, textarea, select")) {
-      window.location.reload();
-    }
-  }, 30000); // 30 seconds
+
+// auto refresh (safe)
+setInterval(() => {
+  if (!document.activeElement.matches("input, textarea, select")) {
+    window.location.reload();
+  }
+}, 30000);
 </script>
-<footer>© 2026 Dr. HomeoCare • Online Homeopathy Consultation</footer>
+
+<footer class="footer">
+  © 2026 Harmony HomeoCare • Online Homeopathy Consultation
+</footer>
+
 </body>
 </html>
