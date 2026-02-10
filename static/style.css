@@ -363,10 +363,17 @@ footer {
 }
 
 .doctor-profile img {
-  width: 180px;
-  border-radius: 50%;
+  width: 180px;              /* unchanged */
+  height: auto;              /* keeps original length */
+  border-radius: 12px;       /* 👈 square corners */
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+background: #fff;
+padding: 4px;
+
 }
+
+
 
 /* -------- GALLERY -------- */
 .gallery {

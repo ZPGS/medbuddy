@@ -10,7 +10,7 @@ from reportlab.lib.pagesizes import A4
 
 from scheduler import auto_expire_reserved, send_reminders
 
-app = Flask(__name__)
+app = Flask(__name__,static_folder="static")
 app.secret_key = "medbuddy-secret"
 
 DB = "medbuddy.db"
@@ -61,6 +61,13 @@ def home():
 @app.route("/patient")
 def patient_page():
     return render_template("patient.html")
+
+
+@app.after_request
+def add_cache_headers(response):
+    if response.content_type.startswith(("image/", "text/css", "application/javascript")):
+        response.headers["Cache-Control"] = "public, max-age=31536000"
+    return response
 
 # =================================================
 # PATIENT
