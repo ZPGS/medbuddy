@@ -53,6 +53,7 @@ import os
 from werkzeug.utils import secure_filename
 app.config["UPLOAD_FOLDER"] = "uploads"
 os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True) 
+
 @app.route("/upload/<code>", methods=["GET", "POST"])
 def upload_reports(code):
 
@@ -114,6 +115,7 @@ def upload_reports(code):
 
     conn.close()
     return render_template("upload_reports.html", code=code)
+
 # ------- 
 @app.route("/admin/reports/<code>")
 def admin_reports(code):

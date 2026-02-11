@@ -1402,15 +1402,66 @@ body {
   min-height: 100vh;
 }
 
-/* Main content expands */
 .main-content {
   flex: 1;
 }
 
-/* Footer styling */
 .footer {
+  text-align: center;
+  padding: 20px;
   background: #1e8449;
   color: white;
+}
+
+/* ===== Upload Page ===== */
+
+.upload-wrapper {
+  display: flex;
+  justify-content: center;
+  padding: 60px 20px;
+}
+
+.upload-card {
+  background: #ffffff;
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+  max-width: 500px;
+  width: 100%;
   text-align: center;
-  padding: 18px;
+}
+
+.upload-title {
+  color: #1e8449;
+  margin-bottom: 10px;
+}
+
+.upload-code {
+  margin-bottom: 25px;
+  font-size: 15px;
+  color: #555;
+}
+
+.file-input-wrapper input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  margin-bottom: 20px;
+}
+
+.upload-btn {
+  background: #1e8449;
+  color: white;
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  width: 100%;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.upload-btn:hover {
+  background: #166534;
 }

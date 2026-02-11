@@ -1,75 +1,47 @@
 <!doctype html>
-<html lang="en">
+<html>
 <head>
-  <title>Medical Reports | Harmony HomeoCare</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload Medical Reports</title>
   <link rel="stylesheet" href="/static/style.css">
-  <link rel="icon" type="image/png"
-      href="{{ url_for('static', filename='favicon.png') }}">
 </head>
 
 <body>
 
-<!-- ===== HEADER (Optional but recommended for consistency) ===== -->
-<header class="admin-header">
-  <div class="header-left"></div>
-  <div class="header-center">Medical Reports</div>
-  <div class="header-right"></div>
-</header>
-
-<!-- ===== MAIN ===== -->
 <main class="main-content">
-  <div class="reports-wrapper">
+  <div class="upload-wrapper">
 
-    <div class="reports-card">
+    <div class="upload-card">
 
-      <h2 class="reports-title">
-        📁 Medical Reports
+      <h2 class="upload-title">
+        📤 Upload Medical Reports
       </h2>
 
-      <p class="reports-code">
+      <p class="upload-code">
         Confirmation No:
         <strong>{{ code }}</strong>
       </p>
 
-      {% if reports %}
-        <div class="reports-list">
-          {% for r in reports %}
-            <div class="report-item">
+      <form method="post"
+            enctype="multipart/form-data"
+            class="upload-form">
 
-              <div class="file-info">
-                <span class="file-icon">📄</span>
-                <span class="file-name">{{ r.file_name }}</span>
-              </div>
-
-              <a href="/{{ r.file_path }}"
-                 target="_blank"
-                 class="view-btn">
-                View
-              </a>
-
-            </div>
-          {% endfor %}
+        <div class="file-input-wrapper">
+          <input type="file"
+                 name="report"
+                 required>
         </div>
-      {% else %}
-        <div class="empty-state">
-          📭 No reports uploaded yet.
-        </div>
-      {% endif %}
 
-      <div class="back-wrapper">
-        <a href="/admin/dashboard" class="back-btn">
-          ← Back to Dashboard
-        </a>
-      </div>
+        <button type="submit" class="upload-btn">
+          Upload Reports
+        </button>
+
+      </form>
 
     </div>
-
   </div>
 </main>
 
-<!-- ===== FOOTER ===== -->
-<footer>
+<footer class="footer">
   © 2026 Harmony HomeoCare • Online Homeopathy Consultation
 </footer>
 
