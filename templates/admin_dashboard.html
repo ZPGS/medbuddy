@@ -4,6 +4,9 @@
   <title>Harmony HomeoCare – Admin</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="/static/style.css">
+  <link rel="icon" type="image/png"
+      href="{{ url_for('static', filename='favicon.png') }}">
+
 </head>
 
 <body>
@@ -127,92 +130,97 @@
 
   <!-- ================= APPOINTMENTS ================= -->
   <section class="bento appointments-box">
-    <h3>Appointments</h3>
+  <h3>Appointments</h3>
 
-    <div class="appointments-scroll">
-      {% for a in appointments %}
+  <div class="appointments-scroll">
+    {% for a in appointments %}
 
-      {% set fee =
-        settings.followup_amount if a.consultation_type == 'followup'
-        else settings.default_amount
-      %}
+    {% set fee =
+      settings.followup_amount if a.consultation_type == 'followup'
+      else settings.default_amount
+    %}
 
-      {% set meet =
-        a.meeting_link
-        if a.meeting_link
-        else settings.default_meeting_link
-        if settings.default_meeting_link
-        else 'Will be shared soon'
-      %}
+    {% set meet =
+      a.meeting_link
+      if a.meeting_link
+      else settings.default_meeting_link
+      if settings.default_meeting_link
+      else 'Will be shared soon'
+    %}
 
-      <div class="appointment-card">
+    <div class="appointment-card">
 
-        <div class="card-top">
-  <div>
-    <strong>{{ a.patient_name }}</strong><br>
-    <small>{{ a.mobile }}</small>
-  </div>
-
-  <div class="badge-group">
-    <span class="consult-badge {{ a.consultation_type }}">
-      {{ a.consultation_type }}
-    </span>
-
-    <span class="status {{ a.status }}">
-      {{ a.status }}
-    </span>
-  </div>
-</div>
-
-
-        <div class="card-mid">
-          {{ a.appointment_date }} • {{ a.slot_time }}<br>
-          <small class="code">{{ a.confirmation_code }}</small><br>
-          <small class="muted">
-           {{ "Follow-up" if a.consultation_type=="FOLLOWUP" else "First Consultation" }}
-
-            • ₹{{ fee }}
-          </small>
+      <!-- ===== TOP ROW ===== -->
+      <div class="card-top">
+        <div>
+          <strong>{{ a.patient_name }}</strong><br>
+          <small>{{ a.mobile }}</small>
         </div>
 
-        <!-- UPDATE -->
-        <form method="post" action="/admin/update/{{ a.id }}">
+        <div class="badge-group">
+          <span class="consult-badge {{ a.consultation_type }}">
+            {{ a.consultation_type }}
+          </span>
 
-          <textarea name="remarks"
-                    placeholder="Internal notes">{{ a.admin_remarks or '' }}</textarea>
+          <span class="status {{ a.status }}">
+            {{ a.status }}
+          </span>
+        </div>
+      </div>
 
-          <input name="meeting_link"
-                 placeholder="Meeting link (optional)"
-                 value="{{ a.meeting_link or '' }}">
+      <!-- ===== MIDDLE ===== -->
+      <div class="card-mid">
+        {{ a.appointment_date }} • {{ a.slot_time }}<br>
+        <small class="code">{{ a.confirmation_code }}</small><br>
+        <small class="muted">
+          {{ "Follow-up" if a.consultation_type=="FOLLOWUP" else "First Consultation" }}
+          • ₹{{ fee }}
+        </small>
+      </div>
 
-          <div class="card-actions">
+      <!-- ===== UPDATE FORM ===== -->
+      <form method="post" action="/admin/update/{{ a.id }}">
 
-            <select name="status">
-              <option value="RESERVED" {% if a.status=="RESERVED" %}selected{% endif %}>RESERVED</option>
-              <option value="CONFIRMED" {% if a.status=="CONFIRMED" %}selected{% endif %}>CONFIRMED</option>
-              <option value="CANCELLED" {% if a.status=="CANCELLED" %}selected{% endif %}>CANCELLED</option>
-              <option value="DONE" {% if a.status=="DONE" %}selected{% endif %}>DONE</option>
-            </select>
+        <textarea name="remarks"
+                  placeholder="Internal notes">{{ a.admin_remarks or '' }}</textarea>
 
-            <button type="submit">Update</button>
+        <input name="meeting_link"
+               placeholder="Meeting link (optional)"
+               value="{{ a.meeting_link or '' }}">
 
-           {% if a.status == "RESERVED" %}
-<a class="wa-btn" target="_blank"
-   href="https://wa.me/{{ a.mobile }}?text={{ settings.reservation_message
-     .replace('{{name}}', a.patient_name)
-     .replace('{{date}}', a.appointment_date)
-     .replace('{{time}}', a.slot_time)
-     .replace('{{amount}}', a.amount|string)
-     .replace('{{upi}}', settings.upi_link)
-     | urlencode }}">
-  💰 Payment Message
-</a>
-{% endif %}
+        <div class="card-actions">
 
+          <!-- Status -->
+          <select name="status">
+            <option value="RESERVED" {% if a.status=="RESERVED" %}selected{% endif %}>RESERVED</option>
+            <option value="CONFIRMED" {% if a.status=="CONFIRMED" %}selected{% endif %}>CONFIRMED</option>
+            <option value="CANCELLED" {% if a.status=="CANCELLED" %}selected{% endif %}>CANCELLED</option>
+            <option value="DONE" {% if a.status=="DONE" %}selected{% endif %}>DONE</option>
+          </select>
 
+          <!-- Full width update -->
+          <button type="submit" class="primary-btn full-width">
+            Update
+          </button>
+
+          <!-- Action Row -->
+          <div class="action-row">
+
+            {% if a.status == "RESERVED" %}
+            <a class="secondary-btn" target="_blank"
+               href="https://wa.me/{{ a.mobile }}?text={{ settings.reservation_message
+                 .replace('{{name}}', a.patient_name)
+                 .replace('{{date}}', a.appointment_date)
+                 .replace('{{time}}', a.slot_time)
+                 .replace('{{amount}}', a.amount|string)
+                 .replace('{{upi}}', settings.upi_link)
+                 | urlencode }}">
+              💰 Payment
+            </a>
+            {% endif %}
 
             {% if a.status == "CONFIRMED" %}
-            <a class="wa-btn" target="_blank"
+            <a class="secondary-btn" target="_blank"
                href="https://wa.me/{{ a.mobile }}?text={{ settings.confirmation_message
                  .replace('{{name}}', a.patient_name)
                  .replace('{{code}}', a.confirmation_code)
@@ -221,29 +229,39 @@
                  .replace('{{meeting_link}}', meet)
                  .replace('{{receipt_link}}',
                    request.url_root ~ 'appointment/pdf/' ~ a.confirmation_code)
+                 .replace('{{upload_link}}',
+                   request.url_root ~ 'upload/' ~ a.confirmation_code)
                  | urlencode }}">
               📲 Confirm
             </a>
             {% endif %}
 
+            <a class="secondary-btn"
+               href="/admin/reports/{{ a.confirmation_code }}">
+              📁 Reports
+            </a>
+
           </div>
-        </form>
 
-        <!-- DELETE APPOINTMENT -->
-        <form method="post"
-      action="/admin/delete_appointment/{{ a.id }}"
-      onsubmit="return confirm('Delete this appointment permanently?');"
-      style="display:inline;">
-  <button type="submit" class="danger-btn">
-    🗑 Delete
-  </button>
-</form>
+        </div>
+      </form>
 
+      <!-- ===== DELETE ===== -->
+      <form method="post"
+            action="/admin/delete_appointment/{{ a.id }}"
+            onsubmit="return confirm('Delete this appointment permanently?');">
 
-      </div>
-      {% endfor %}
+        <button type="submit" class="danger-btn full-width">
+          🗑 Delete Appointment
+        </button>
+
+      </form>
+
     </div>
-  </section>
+    {% endfor %}
+  </div>
+</section>
+
 
   <!-- ================= SLOTS ================= -->
   <section class="bento slots-box">

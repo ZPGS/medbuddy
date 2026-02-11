@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+<head>
+  <title>Upload Successful</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="icon" type="image/png"
+      href="{{ url_for('static', filename='favicon.png') }}">
+</head>
+<body>
+
+<div class="container">
+  <h2>✅ Reports Uploaded Successfully</h2>
+
+  <p>
+    Thank you <strong>{{ patient_name }}</strong>.
+  </p>
+
+  <p>
+    Your medical reports have been received for
+    appointment <strong>{{ code }}</strong>.
+  </p>
+
+  <a href="/" class="primary-btn">Return Home</a>
+</div>
+<footer class="footer">
+  © 2026 Harmony HomeoCare • Online Homeopathy Consultation
+</footer>
+</body>
+</html>

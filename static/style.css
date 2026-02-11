@@ -315,7 +315,7 @@ footer {
   padding: 20px;
   background: #1e8449;
   color: white;
-  margin-top: 40px;
+
 }
 
 /* -------- FLASH -------- */
@@ -372,8 +372,108 @@ background: #fff;
 padding: 4px;
 
 }
+/* ================= REPORTS PAGE ================= */
 
+.main-content {
+  flex: 1;
+  padding: 40px 20px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
 
+.reports-wrapper {
+  width: 100%;
+  max-width: 700px;
+}
+
+.reports-card {
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 14px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+}
+
+.reports-title {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #1e8449;
+}
+
+.reports-code {
+  margin-bottom: 25px;
+  color: #555;
+}
+
+.reports-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.report-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  border-radius: 8px;
+  background: #f6f8f7;
+  transition: 0.2s ease;
+}
+
+.report-item:hover {
+  background: #eef4f1;
+}
+
+.file-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.file-name {
+  font-weight: 500;
+  color: #333;
+  word-break: break-word;
+}
+
+.view-btn {
+  background: #1e8449;
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 14px;
+  transition: 0.2s ease;
+}
+
+.view-btn:hover {
+  background: #166534;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 20px;
+  color: #888;
+  background: #f6f6f6;
+  border-radius: 8px;
+}
+
+.back-wrapper {
+  margin-top: 25px;
+  text-align: center;
+}
+
+.back-btn {
+  text-decoration: none;
+  color: #1e8449;
+  font-weight: 500;
+}
+
+.back-btn:hover {
+  text-decoration: underline;
+}
 
 /* -------- GALLERY -------- */
 .gallery {
@@ -1224,4 +1324,93 @@ main.content {
 
 .menu-btn:hover {
   background: rgba(255,255,255,0.15);
+}
+/* ===== BUTTON STRUCTURE ===== */
+
+.card-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.action-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Primary */
+.primary-btn {
+  background: #1e8449;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.primary-btn:hover {
+  background: #166b3a;
+}
+
+/* Secondary */
+.secondary-btn {
+  background: #2ecc71;
+  color: white;
+  padding: 10px 14px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.secondary-btn:hover {
+  background: #27ae60;
+}
+
+/* Danger */
+.danger-btn {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.danger-btn:hover {
+  background: #c0392b;
+}
+
+/* Full width */
+.full-width {
+  width: 100%;
+}
+/* ===== Sticky Footer Layout ===== */
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Main content expands */
+.main-content {
+  flex: 1;
+}
+
+/* Footer styling */
+.footer {
+  background: #1e8449;
+  color: white;
+  text-align: center;
+  padding: 18px;
 }

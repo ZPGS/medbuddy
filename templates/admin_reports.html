@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <title>Medical Reports | Harmony HomeoCare</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="icon" type="image/png"
+      href="{{ url_for('static', filename='favicon.png') }}">
+</head>
+
+<body>
+
+<!-- ===== HEADER (Optional but recommended for consistency) ===== -->
+<header class="admin-header">
+  <div class="header-left"></div>
+  <div class="header-center">Medical Reports</div>
+  <div class="header-right"></div>
+</header>
+
+<!-- ===== MAIN ===== -->
+<main class="main-content">
+  <div class="reports-wrapper">
+
+    <div class="reports-card">
+
+      <h2 class="reports-title">
+        📁 Medical Reports
+      </h2>
+
+      <p class="reports-code">
+        Confirmation No:
+        <strong>{{ code }}</strong>
+      </p>
+
+      {% if reports %}
+        <div class="reports-list">
+          {% for r in reports %}
+            <div class="report-item">
+
+              <div class="file-info">
+                <span class="file-icon">📄</span>
+                <span class="file-name">{{ r.file_name }}</span>
+              </div>
+
+              <a href="/{{ r.file_path }}"
+                 target="_blank"
+                 class="view-btn">
+                View
+              </a>
+
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-state">
+          📭 No reports uploaded yet.
+        </div>
+      {% endif %}
+
+      <div class="back-wrapper">
+        <a href="/admin/dashboard" class="back-btn">
+          ← Back to Dashboard
+        </a>
+      </div>
+
+    </div>
+
+  </div>
+</main>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  © 2026 Harmony HomeoCare • Online Homeopathy Consultation
+</footer>
+
+</body>
+</html>

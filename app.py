@@ -1,6 +1,6 @@
 from flask import (
     Flask, render_template, request,
-    redirect, session, flash, jsonify, send_file
+    redirect, send_from_directory, session, flash, jsonify, send_file
 )
 import sqlite3, io
 from datetime import datetime, date
@@ -44,6 +44,105 @@ def doctor_cancel_message(appt):
         f"Time: {appt['slot_time']}\n\n"
         f"Please cancel/delete this appointment from admin panel."
     )
+# ----------------Upload ---------------
+def allowed_file(filename):
+    ALLOWED_EXTENSIONS = {'pdf', 'png', 'jpg', 'jpeg', 'doc', 'docx'}
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS 
+import os
+from werkzeug.utils import secure_filename
+app.config["UPLOAD_FOLDER"] = "uploads"
+os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True) 
+@app.route("/upload/<code>", methods=["GET", "POST"])
+def upload_reports(code):
+
+    conn = db()
+
+    # Validate appointment
+    appt = conn.execute(
+        "SELECT * FROM appointments WHERE confirmation_code=?",
+        (code,)
+    ).fetchone()
+
+    if not appt:
+        conn.close()
+        return "Invalid confirmation code", 404
+
+    if request.method == "POST":
+
+        file = request.files.get("report")
+
+        if not file or file.filename == "":
+            conn.close()
+            return render_template(
+                "upload_reports.html",
+                code=code,
+                error="Please select a file to upload."
+            )
+
+        import os
+        from werkzeug.utils import secure_filename
+
+        filename = secure_filename(file.filename)
+
+        upload_folder = "uploads"
+        os.makedirs(upload_folder, exist_ok=True)
+
+        file_path = os.path.join(upload_folder, filename)
+        file.save(file_path)
+
+        conn.execute("""
+            INSERT INTO medical_reports
+            (confirmation_code, file_name, file_path, uploaded_at)
+            VALUES (?, ?, ?, ?)
+        """, (
+            code,
+            filename,
+            file_path,
+            datetime.now().isoformat()
+        ))
+
+        conn.commit()
+        conn.close()
+
+        # ✅ Render success page
+        return render_template(
+            "upload_success.html",
+            code=code,
+            patient_name=appt["patient_name"]
+        )
+
+    conn.close()
+    return render_template("upload_reports.html", code=code)
+# ------- 
+@app.route("/admin/reports/<code>")
+def admin_reports(code):
+    if not session.get("admin"):
+        return redirect("/admin")
+
+    conn = db()
+
+    reports = conn.execute("""
+        SELECT * FROM medical_reports
+        WHERE confirmation_code=?
+        ORDER BY uploaded_at DESC
+    """, (code,)).fetchall()
+
+    conn.close()
+
+    return render_template(
+        "admin_reports.html",
+        reports=reports,
+        code=code
+    )
+# =================================================
+
+def send_from_directory(directory, filename):
+    return send_file(os.path.join(directory, filename))
+@app.route('/uploads/<path:filename>')
+def uploaded_file(filename):
+    return send_from_directory('uploads', filename)
+
 
 # ---------------- SCHEDULER ----------------
 scheduler = BackgroundScheduler()

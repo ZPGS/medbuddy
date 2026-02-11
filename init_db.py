@@ -6,6 +6,13 @@ conn = sqlite3.connect(DB)
 c = conn.cursor()
 
 # =================================================
+# HELPER
+# =================================================
+def column_exists(table, column):
+    c.execute(f"PRAGMA table_info({table})")
+    return column in [row[1] for row in c.fetchall()]
+
+# =================================================
 # SLOTS
 # =================================================
 c.execute("""
@@ -50,6 +57,20 @@ CREATE TABLE IF NOT EXISTS appointments (
 """)
 
 # =================================================
+# MEDICAL REPORTS
+# =================================================
+c.execute("""
+CREATE TABLE IF NOT EXISTS medical_reports (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    confirmation_code TEXT NOT NULL,
+    appointment_id INTEGER,
+    file_name TEXT NOT NULL,
+    file_path TEXT NOT NULL,
+    uploaded_at TEXT NOT NULL
+)
+""")
+
+# =================================================
 # ADMIN SETTINGS
 # =================================================
 c.execute("""
@@ -70,26 +91,28 @@ CREATE TABLE IF NOT EXISTS admin_settings (
 """)
 
 # =================================================
-# SAFE MIGRATIONS (ADD MISSING COLUMNS)
+# SAFE MIGRATIONS
 # =================================================
-def column_exists(table, column):
-    c.execute(f"PRAGMA table_info({table})")
-    return column in [row[1] for row in c.fetchall()]
 
-# ---- appointments table ----
+# ---- appointments ----
 if not column_exists("appointments", "consultation_type"):
     c.execute("ALTER TABLE appointments ADD COLUMN consultation_type TEXT DEFAULT 'first'")
 
-# ---- admin_settings table ----
+# ---- admin_settings ----
 if not column_exists("admin_settings", "followup_amount"):
     c.execute("ALTER TABLE admin_settings ADD COLUMN followup_amount INTEGER DEFAULT 300")
 
 if not column_exists("admin_settings", "default_meeting_link"):
     c.execute("ALTER TABLE admin_settings ADD COLUMN default_meeting_link TEXT")
 
+# ---- medical_reports ----
+if not column_exists("medical_reports", "appointment_id"):
+    c.execute("ALTER TABLE medical_reports ADD COLUMN appointment_id INTEGER")
+
 # =================================================
 # DEFAULT MESSAGE TEMPLATES
 # =================================================
+
 reservation_message = (
     "Hello {{name}},\n\n"
     "Your appointment has been RESERVED.\n\n"
@@ -116,6 +139,8 @@ confirmation_message = (
     "{{meeting_link}}\n\n"
     "Download Receipt:\n"
     "{{receipt_link}}\n\n"
+    "Upload Medical Reports:\n"
+    "{{upload_link}}\n\n"
     "Thank you,\n"
     "Dr. Shweta Chandrakant Zungare"
 )
