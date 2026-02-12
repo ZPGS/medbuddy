@@ -357,7 +357,7 @@ def appointment_pdf(code):
 
     # ================= HEADER =================
     pdf.setFont("Helvetica-Bold", 18)
-    pdf.drawCentredString(width / 2, y, "SangamKripa HomeoCare")
+    pdf.drawCentredString(width / 2, y, "Harmony HomeoCare")
     y -= 25
 
     pdf.setFont("Helvetica", 11)
