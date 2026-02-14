@@ -2,13 +2,36 @@
 <html>
 <head>
   <title>Appointment History</title>
-  <link rel="stylesheet" href="/static/history.css" />
+  <link rel="stylesheet" href="/static/style.css" />
   <link rel="icon" type="image/png"
         href="{{ url_for('static', filename='favicon.png') }}">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    /* ===== STICKY FOOTER LAYOUT ===== */
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    .page-wrapper {
+      flex: 1;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      background: #1e8449;
+      color: white;
+    }
+  </style>
 </head>
 
 <body>
+
+<div class="page-wrapper">
 
 <header class="page-header">
   <h2>Appointment History</h2>
@@ -79,6 +102,12 @@
   {% endif %}
 
 </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  © 2026 Harmony HomeoCare • Online Homeopathy Consultation
+</footer>
 
 </body>
 </html>
