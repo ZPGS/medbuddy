@@ -1,0 +1,108 @@
+.page-header {
+  text-align: center;
+  padding: 30px 0;
+}
+
+.history-container {
+  max-width: 1000px;
+  margin: auto;
+  padding: 20px;
+}
+
+.search-form {
+  margin-bottom: 25px;
+}
+
+.search-row {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.search-row input {
+  flex: 1;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.search-row button {
+  padding: 12px 20px;
+  background: #1e8449;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.history-table th {
+  background: #1e8449;
+  color: white;
+  padding: 12px;
+  text-align: left;
+}
+
+.history-table td {
+  padding: 14px;
+  border-bottom: 1px solid #eee;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.pdf-btn {
+  color: #1e8449;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.cancel-btn {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.status-badge {
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-badge.RESERVED {
+  background: #f4e1a1;
+  color: #7d6608;
+}
+
+.status-badge.CONFIRMED {
+  background: #d4efdf;
+  color: #145a32;
+}
+
+.status-badge.CANCELLED {
+  background: #f5b7b1;
+  color: #922b21;
+}
+
+.status-badge.DONE {
+  background: #d6dbdf;
+  color: #2c3e50;
+}

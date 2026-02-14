@@ -1,58 +1,84 @@
 <!doctype html>
 <html>
-  <head>
-    <title>Appointment History</title>
-    <link rel="stylesheet" href="/static/style.css" />
-    <link rel="icon" type="image/png"
-      href="{{ url_for('static', filename='favicon.png') }}">
-  </head>
-  <body>
-    <header>
-      <h2>Appointment History</h2>
-    </header>
+<head>
+  <title>Appointment History</title>
+  <link rel="stylesheet" href="/static/history.css" />
+  <link rel="icon" type="image/png"
+        href="{{ url_for('static', filename='favicon.png') }}">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
 
-    <div class="container">
-      <form method="post">
-        <input name="mobile" placeholder="Enter Mobile Number" required />
-        <button>View History</button>
-      </form>
+<body>
 
-      {% if appointments %}
-      <h3>Your Appointments</h3>
+<header class="page-header">
+  <h2>Appointment History</h2>
+</header>
 
-      <table>
+<div class="history-container">
+
+  <!-- SEARCH FORM -->
+  <form method="post" class="search-form">
+    <div class="search-row">
+      <input name="mobile"
+             placeholder="Enter Mobile Number"
+             value="{{ request.form.mobile or '' }}">
+
+      <input name="confirmation_code"
+             placeholder="Search by Confirmation Code"
+             value="{{ request.form.confirmation_code or '' }}">
+
+      <button type="submit">Search</button>
+    </div>
+  </form>
+
+  {% if appointments %}
+  <div class="table-wrapper">
+    <table class="history-table">
+      <thead>
         <tr>
           <th>Confirmation</th>
           <th>Date</th>
           <th>Time</th>
           <th>Status</th>
-          <th>Actions</th>
+          <th class="actions-col">Actions</th>
         </tr>
+      </thead>
 
+      <tbody>
         {% for a in appointments %}
         <tr>
-          <td>{{ a.confirmation_code }}</td>
+          <td class="code">{{ a.confirmation_code }}</td>
           <td>{{ a.appointment_date }}</td>
           <td>{{ a.slot_time }}</td>
-          <td class="status {{ a.status }}">{{ a.status }}</td>
+
           <td>
-            <a href="/appointment/pdf/{{ a.confirmation_code }}">PDF</a>
+            <span class="status-badge {{ a.status }}">
+              {{ a.status }}
+            </span>
+          </td>
+
+          <td class="actions">
+            <a class="pdf-btn"
+               href="/appointment/pdf/{{ a.confirmation_code }}">
+               📄 PDF
+            </a>
 
             {% if a.status == "RESERVED" %}
-            <form
-              method="post"
-              action="/cancel/{{ a.confirmation_code }}"
-              style="display: inline"
-              onsubmit="return confirm('Cancel appointment?');"
-            >
-              <button style="background: red">Cancel</button>
+            <form method="post"
+                  action="/cancel/{{ a.confirmation_code }}"
+                  onsubmit="return confirm('Cancel appointment?');">
+              <button class="cancel-btn">Cancel</button>
             </form>
             {% endif %}
           </td>
         </tr>
         {% endfor %}
-      </table>
-      {% endif %}
-    </div>
-  </body>
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+</div>
+
+</body>
 </html>

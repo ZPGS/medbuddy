@@ -122,24 +122,31 @@ def uploaded_file(filename):
         as_attachment=False  # 🔥 THIS is important
     )
 
-@app.route("/history/<code>")
-def history(code):
-    appt = get_single("appointments", "confirmation_code", code)
-    if not appt:
-        return "Invalid confirmation code", 404
+# ==============================
+# HISTORY
+@app.route("/history", methods=["GET", "POST"], strict_slashes=False)
+def history():
+    appointments = []
 
-    reports = supabase.table("medical_reports") \
-        .select("*") \
-        .eq("confirmation_code", code) \
-        .order("uploaded_at", desc=True) \
-        .execute().data
+    if request.method == "POST":
+        mobile = request.form.get("mobile")
+        code = request.form.get("confirmation_code")
 
-    return render_template(
-        "history.html",
-        appt=appt,
-        reports=reports
-    )
-    
+        query = supabase.table("appointments").select("*")
+
+        if mobile:
+            query = query.eq("mobile", mobile)
+
+        if code:
+            query = query.ilike("confirmation_code", f"%{code}%")
+
+        response = query.order("created_at", desc=True).execute()
+
+        appointments = response.data if response.data else []
+
+    return render_template("history.html", appointments=appointments)
+
+
 # ==============================
 # PDF RECEIPT (NEW)
 # ==============================
@@ -218,6 +225,29 @@ def appointment_pdf(code):
         download_name=f"{code}.pdf",
         mimetype="application/pdf"
     )
+
+@app.route("/appointment/cancel/<code>", methods=["POST"])
+def cancel_appointment(code):
+    if not session.get("admin"):
+        return redirect("/admin")
+
+    appt = get_single("appointments", "confirmation_code", code)
+    if not appt:
+        flash("Invalid confirmation code", "patient-error")
+        return redirect("/admin/dashboard")
+
+    supabase.table("appointments") \
+        .update({"status": "CANCELLED"}) \
+        .eq("confirmation_code", code) \
+        .execute()
+
+    supabase.table("slots") \
+        .update({"is_booked": False}) \
+        .eq("id", appt["slot_id"]) \
+        .execute()
+
+    flash(f"Appointment cancelled for {code}", "patient-info")
+    return redirect("/admin/dashboard")
 
 # ==============================
 # PUBLIC
