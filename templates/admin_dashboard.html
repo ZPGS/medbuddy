@@ -134,7 +134,7 @@
     {% for a in appointments %}
 
     {% set fee =
-      settings.followup_amount if a.consultation_type == 'followup'
+      settings.followup_amount if a.consultation_type == 'FOLLOWUP' and settings.followup_amount is not none
       else settings.default_amount
     %}
 

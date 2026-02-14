@@ -10,7 +10,7 @@
 
 <body>
 
-<!-- ===== HEADER (Optional but recommended for consistency) ===== -->
+<!-- ===== HEADER ===== -->
 <header class="admin-header">
   <div class="header-left"></div>
   <div class="header-center">Medical Reports</div>
@@ -37,16 +37,30 @@
           {% for r in reports %}
             <div class="report-item">
 
+              <!-- File Info -->
               <div class="file-info">
                 <span class="file-icon">📄</span>
                 <span class="file-name">{{ r.file_name }}</span>
               </div>
 
-              <a href="/{{ r.file_path }}"
-                 target="_blank"
-                 class="view-btn">
-                View
-              </a>
+              <!-- Action Buttons -->
+              <div class="report-actions">
+
+                <!-- VIEW -->
+                <a href="/uploads/{{ r.file_name }}"
+                   target="_blank"
+                   class="view-btn">
+                   👁 View
+                </a>
+
+                <!-- DOWNLOAD -->
+                <a href="/uploads/{{ r.file_name }}"
+                   download
+                   class="download-btn view-btn">
+                   ⬇ Download
+                </a>
+
+              </div>
 
             </div>
           {% endfor %}
