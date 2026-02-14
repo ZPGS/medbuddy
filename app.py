@@ -122,7 +122,24 @@ def uploaded_file(filename):
         as_attachment=False  # 🔥 THIS is important
     )
 
+@app.route("/history/<code>")
+def history(code):
+    appt = get_single("appointments", "confirmation_code", code)
+    if not appt:
+        return "Invalid confirmation code", 404
 
+    reports = supabase.table("medical_reports") \
+        .select("*") \
+        .eq("confirmation_code", code) \
+        .order("uploaded_at", desc=True) \
+        .execute().data
+
+    return render_template(
+        "history.html",
+        appt=appt,
+        reports=reports
+    )
+    
 # ==============================
 # PDF RECEIPT (NEW)
 # ==============================
@@ -469,6 +486,36 @@ def status():
 
     return render_template("status.html", appointment=appointment)
 
+@app.route("/admin/delete_appointment/<int:id>", methods=["POST"])
+def delete_appointment(id):
+    if not session.get("admin"):
+        return redirect("/admin")
+
+    # Get appointment to free slot
+    appt = supabase.table("appointments") \
+        .select("slot_id") \
+        .eq("id", id) \
+        .maybe_single() \
+        .execute()
+
+    if appt.data:
+        # Free the slot
+        supabase.table("slots") \
+            .update({"is_booked": False}) \
+            .eq("id", appt.data["slot_id"]) \
+            .execute()
+
+        # Delete appointment
+        supabase.table("appointments") \
+            .delete() \
+            .eq("id", id) \
+            .execute()
+
+        flash("Appointment deleted and slot freed", "admin-info")
+    else:
+        flash("Appointment not found", "admin-error")
+
+    return redirect("/admin/dashboard")
 
 @app.route("/admin/logout")
 def admin_logout():
