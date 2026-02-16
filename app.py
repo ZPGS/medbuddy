@@ -1,3 +1,4 @@
+import select
 from flask import (
     Flask, render_template, request,
     redirect, session, flash, jsonify, send_file
@@ -145,6 +146,64 @@ def history():
         appointments = response.data if response.data else []
 
     return render_template("history.html", appointments=appointments)
+
+
+@app.route("/history/<code>")
+def history_detail(code):
+    appt = get_single("appointments", "confirmation_code", code)
+
+    if not appt:
+        return "Invalid confirmation code", 404
+
+    reports = supabase.table("medical_reports") \
+        .select("*") \
+        .eq("confirmation_code", code) \
+        .order("uploaded_at", desc=True) \
+        .execute().data
+    return render_template(
+        "history_detail.html",
+        appt=appt,
+        reports=reports
+    )
+
+@app.route("/admin/history", methods=["GET", "POST"], strict_slashes=False)
+def admin_history():
+    if not session.get("admin"):
+        return redirect("/admin")
+
+    appointments = []
+    search_value = ""
+
+    if request.method == "POST":
+        search_value = request.form.get("search", "").strip()
+
+        if search_value:
+            response = (
+                supabase
+                .table("appointments")
+                .select("*")
+                .or_(f"mobile.ilike.%{search_value}%,patient_name.ilike.%{search_value}%")
+                .order("created_at", desc=True)
+                .execute()
+            )
+        else:
+            response = (
+                supabase
+                .table("appointments")
+                .select("*")
+                .order("created_at", desc=True)
+                .execute()
+            )
+
+        appointments = response.data or []
+
+    return render_template(
+        "admin_history.html",
+        appointments=appointments,
+        search_value=search_value
+    )
+
+
 
 
 # ==============================

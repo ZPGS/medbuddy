@@ -25,40 +25,64 @@
 
 <!-- ================= SIDE PANEL ================= -->
 <div id="sidePanel" class="side-panel">
-  <h3>Doctor Settings</h3>
 
-  <form method="post" action="/admin/settings">
+  <div class="side-panel-header">
+    <h3>⚙ Doctor Settings</h3>
+  </div>
 
-    <label>Doctor WhatsApp</label>
-    <input name="doctor_whatsapp"
-           value="{{ settings.doctor_whatsapp }}"
-           placeholder="919588460141">
+  <form method="post" action="/admin/settings" class="settings-form">
 
-    <label>First Consultation Fee (₹)</label>
-    <input type="number"
-           name="default_amount"
-           value="{{ settings.default_amount }}"
-           placeholder="500">
+    <div class="form-group">
+      <label>Doctor WhatsApp</label>
+      <input name="doctor_whatsapp"
+             value="{{ settings.doctor_whatsapp }}"
+             placeholder="919588460141">
+    </div>
 
-    <label>Follow-up Fee (₹)</label>
-    <input type="number"
-           name="followup_amount"
-           value="{{ settings.followup_amount }}"
-           placeholder="300">
+    <div class="form-group">
+      <label>First Consultation Fee (₹)</label>
+      <input type="number"
+             name="default_amount"
+             value="{{ settings.default_amount }}"
+             placeholder="500">
+    </div>
 
-    <label>UPI ID / Payment Link</label>
-    <input name="upi_link"
-           value="{{ settings.upi_link }}"
-           placeholder="9588460141@ybl">
+    <div class="form-group">
+      <label>Follow-up Fee (₹)</label>
+      <input type="number"
+             name="followup_amount"
+             value="{{ settings.followup_amount }}"
+             placeholder="300">
+    </div>
 
-    <label>Default Meeting Link</label>
-    <input name="default_meeting_link"
-           value="{{ settings.default_meeting_link }}"
-           placeholder="https://meet.google.com/...">
+    <div class="form-group">
+      <label>UPI ID / Payment Link</label>
+      <input name="upi_link"
+             value="{{ settings.upi_link }}"
+             placeholder="9588460141@ybl">
+    </div>
 
-    <button type="submit">Save Settings</button>
+    <div class="form-group">
+      <label>Default Meeting Link</label>
+      <input name="default_meeting_link"
+             value="{{ settings.default_meeting_link }}"
+             placeholder="https://meet.google.com/...">
+    </div>
 
-    <a href="/admin/logout" class="logout-btn">Logout</a>
+    <div class="side-actions">
+      <button type="submit" class="primary-btn full-width">
+        💾 Save Settings
+      </button>
+
+      <a href="/history" class="secondary-btn full-width">
+        📜 Patient History
+      </a>
+
+      <a href="/admin/logout" class="danger-btn full-width">
+        🚪 Logout
+      </a>
+    </div>
+
   </form>
 </div>
 
@@ -238,6 +262,10 @@
                href="/admin/reports/{{ a.confirmation_code }}">
               📁 Reports
             </a>
+            <a class="secondary-btn"
+   href="/admin/history?mobile={{ a.mobile }}">
+   📜 View History
+</a>
 
           </div>
 

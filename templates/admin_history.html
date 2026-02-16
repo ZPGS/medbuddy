@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <title>Patient History | Harmony HomeoCare</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="icon" type="image/png"
+        href="{{ url_for('static', filename='favicon.png') }}">
+</head>
+
+<body class="layout">
+
+<!-- ===== HEADER ===== -->
+<header class="admin-header">
+  <div class="header-left"></div>
+  <div class="header-center">Patient Appointment History</div>
+  <div class="header-right"></div>
+</header>
+
+<!-- ===== MAIN ===== -->
+<main class="main-content">
+
+  <div class="container history-container">
+
+    <!-- ===== SEARCH ===== -->
+    <form method="post" class="history-search">
+  <input name="search"
+         placeholder="Search by Mobile or Name"
+         value="{{ search_value or '' }}"
+         required>
+  <button type="submit">Search</button>
+</form>
+
+
+    </div>
+
+    {% if patients %}
+
+      {% for patient in patients %}
+      <div class="history-patient-card">
+
+        <!-- Patient Header -->
+        <div class="patient-header">
+          <div>
+            <h3>{{ patient.name }}</h3>
+            <small>{{ patient.mobile }}</small>
+          </div>
+          <span class="total-badge">
+            {{ patient.appointments|length }} Appointments
+          </span>
+        </div>
+
+        <!-- Appointments Table -->
+        <div class="history-table-wrapper">
+          <table class="history-table">
+            <thead>
+              <tr>
+                <th>Confirmation</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Fee</th>
+                <th>PDF</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for a in patient.appointments %}
+              <tr>
+                <td>{{ a.confirmation_code }}</td>
+                <td>{{ a.appointment_date }}</td>
+                <td>{{ a.slot_time }}</td>
+                <td>
+                  <span class="consult-badge {{ a.consultation_type }}">
+                    {{ a.consultation_type }}
+                  </span>
+                </td>
+                <td>
+                  <span class="status {{ a.status }}">
+                    {{ a.status }}
+                  </span>
+                </td>
+                <td>₹{{ a.amount }}</td>
+                <td>
+                  <a href="/appointment/pdf/{{ a.confirmation_code }}"
+                     class="secondary-btn small">
+                     PDF
+                  </a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+      {% endfor %}
+
+    {% elif search %}
+      <div class="empty-state">
+        No appointment history found.
+      </div>
+    {% endif %}
+
+  </div>
+
+</main>
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+  © 2026 Harmony HomeoCare • Admin Panel
+</footer>
+
+</body>
+</html>
