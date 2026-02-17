@@ -332,7 +332,34 @@ def home():
 
 @app.route("/patient")
 def patient_page():
-    return render_template("patient.html")
+
+    # Get settings
+    settings_response = supabase.table("admin_settings") \
+        .select("*") \
+        .eq("id", 1) \
+        .maybe_single() \
+        .execute()
+
+    settings = settings_response.data if settings_response.data else {}
+
+    # Get available slots
+    today = date.today().isoformat()
+
+    slots_response = supabase.table("slots") \
+        .select("*") \
+        .eq("is_booked", False) \
+        .gte("slot_date", today) \
+        .order("slot_date") \
+        .execute()
+
+    slots = slots_response.data if slots_response.data else []
+
+    return render_template(
+        "patient.html",
+        settings=settings,
+        slots=slots
+    )
+
 
 # ==============================
 # PATIENT
@@ -626,6 +653,38 @@ def delete_appointment(id):
         flash("Appointment not found", "admin-error")
 
     return redirect("/admin/dashboard")
+
+@app.route("/admin/delete/slot/<int:id>", methods=["POST"])
+def delete_slot(id):
+    if not session.get("admin"):
+        return redirect("/admin")
+
+    # Check slot
+    response = supabase.table("slots") \
+        .select("*") \
+        .eq("id", id) \
+        .maybe_single() \
+        .execute()
+
+    slot = response.data
+
+    if not slot:
+        flash("Slot not found", "admin-error")
+        return redirect("/admin/dashboard")
+
+    if slot["is_booked"]:
+        flash("Cannot delete a booked slot", "admin-error")
+        return redirect("/admin/dashboard")
+
+    # Delete slot
+    supabase.table("slots") \
+        .delete() \
+        .eq("id", id) \
+        .execute()
+
+    flash("Slot deleted successfully", "admin-info")
+    return redirect("/admin/dashboard")
+
 
 @app.route("/admin/logout")
 def admin_logout():

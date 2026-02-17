@@ -3,147 +3,95 @@
 <head>
   <title>Book Appointment | Harmony HomeoCare</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="/static/patient.css">
   <link rel="icon" type="image/png"
-      href="{{ url_for('static', filename='favicon.png') }}">
-
+        href="{{ url_for('static', filename='favicon.png') }}">
 </head>
 
-<body>
-<main class="content"></main>
-<header>
-  <h2 class="page-title">Book Your Appointment</h2>
+<body class="layout">
+
+<!-- ================= HERO ================= -->
+<header class="page-hero">
+  <h1>Book Your Appointment</h1>
+  <p>Online Homeopathy Consultation</p>
 </header>
 
+<!-- ================= MAIN ================= -->
+<main class="main-content">
 
-  <div class="container">
+  <div class="booking-card">
 
-    <!-- FLASH MESSAGES -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-  {% for category, msg in messages %}
-    {% if category.startswith('patient-') %}
-      <div class="flash {{ category }}">{{ msg }}</div>
-    {% endif %}
-  {% endfor %}
-{% endwith %}
+    <form method="post" action="/book">
 
+      <!-- ========== PATIENT DETAILS ========== -->
+      <h2 class="section-title">Patient Details</h2>
 
-    <form method="post" action="/book" class="fade-in">
-
-      <!-- ================= PATIENT DETAILS ================= -->
-      <h3>Patient Details</h3>
-
-      <input name="patient_name" placeholder="Full Name" required>
-
-      <input
-        name="mobile"
-        placeholder="Mobile Number"
-        pattern="[0-9]{10}"
-        title="Enter 10 digit mobile number"
-        required>
-
-      <textarea
-        name="address"
-        placeholder="Postal Address"
-        required></textarea>
-
-      <!-- ================= CONSULTATION TYPE ================= -->
-      <h3>Consultation Type</h3>
-
-      <div class="toggle-row">
-        <span>First Consultation</span>
-
-        <label class="switch">
-          <input type="checkbox" id="followupToggle">
-          <span class="slider"></span>
-        </label>
-
-        <span>Follow-up</span>
+      <div class="form-group">
+        <input name="patient_name" placeholder="Full Name" required>
       </div>
 
-      <!-- Hidden value sent to backend -->
-      <input type="hidden" name="consultation_type" id="consultationType" value="FIRST">
+      <div class="form-group">
+        <input name="mobile" placeholder="Mobile Number" required>
+      </div>
 
-      <p class="fee-note">
-        Consultation Fee:
-        <strong id="feeDisplay">₹500</strong>
-      </p>
+      <div class="form-group">
+        <textarea name="address"
+                  placeholder="Postal Address"
+                  required></textarea>
+      </div>
 
-      <!-- ================= SLOT SELECTION ================= -->
-      <h3>Select Available Slot</h3>
+      <!-- ========== CONSULTATION TYPE ========== -->
+      <h2 class="section-title">Consultation Type</h2>
 
-      <select name="slot_id" id="slotSelect" required>
-        <option value="">Loading slots…</option>
-      </select>
+      <div class="consultation-options">
 
+        <label class="consult-card">
+          <input type="radio" name="consultation_type" value="FIRST" checked>
+          <div class="consult-content">
+            <h3>First Consultation</h3>
+            <p>₹{{ settings.default_amount }}</p>
+          </div>
+        </label>
+
+        <label class="consult-card">
+          <input type="radio" name="consultation_type" value="FOLLOWUP">
+          <div class="consult-content">
+            <h3>Follow-up</h3>
+            <p>₹{{ settings.followup_amount }}</p>
+          </div>
+        </label>
+
+      </div>
+
+      <!-- ========== SLOT SELECTION ========== -->
+      <h2 class="section-title">Select Available Slot</h2>
+
+      <div class="form-group">
+        <select name="slot_id" required>
+          <option value="">Select a slot</option>
+          {% for s in slots %}
+            <option value="{{ s.id }}">
+              {{ s.slot_date }} • {{ s.start_time }} - {{ s.end_time }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- ========== BUTTON ========== -->
       <button type="submit" class="primary-btn">
         Reserve Appointment
       </button>
 
     </form>
+
   </div>
+
 </main>
 
+<!-- ================= FOOTER ================= -->
 <footer class="footer">
-  © 2026 Harmony HomeoCare • Online Homeopathy Consultation • Powered by MediSync
+  © 2026 Harmony HomeoCare • Online Homeopathy Consultation
 </footer>
 
-<!-- ================= JS ================= -->
-<script>
-const slotSelect = document.getElementById("slotSelect");
-const feeDisplay = document.getElementById("feeDisplay");
-const toggle = document.getElementById("followupToggle");
-const consultType = document.getElementById("consultationType");
-
-const FIRST_FEE = 500;
-const FOLLOWUP_FEE = 300;
-
-// -------- Toggle Logic --------
-toggle.addEventListener("change", () => {
-  if (toggle.checked) {
-    consultType.value = "FOLLOWUP";
-    feeDisplay.innerText = `₹${FOLLOWUP_FEE}`;
-  } else {
-    consultType.value = "FIRST";
-    feeDisplay.innerText = `₹${FIRST_FEE}`;
-  }
-});
-
-// -------- Load Slots (future only) --------
-function loadSlots() {
-  fetch("/slots")
-    .then(r => r.json())
-    .then(slots => {
-      slotSelect.innerHTML = "<option value=''>Select Slot</option>";
-
-      const today = new Date().toISOString().split("T")[0];
-
-      slots.forEach(s => {
-        if (s.slot_date >= today) {
-          const opt = document.createElement("option");
-          opt.value = s.id;
-          opt.textContent =
-            `${s.slot_date} | ${s.start_time} - ${s.end_time}`;
-          slotSelect.appendChild(opt);
-        }
-      });
-
-      if (slotSelect.options.length === 1) {
-        slotSelect.innerHTML =
-          "<option value=''>No upcoming slots available</option>";
-      }
-    });
-}
-
-loadSlots();
-
-// -------- Auto refresh slots --------
-setInterval(() => {
-  if (!document.activeElement.matches("input, textarea, select")) {
-    loadSlots();
-  }
-}, 30000);
-</script>
-</main>
 </body>
 </html>
