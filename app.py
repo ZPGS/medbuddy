@@ -125,27 +125,32 @@ def uploaded_file(filename):
 
 # ==============================
 # HISTORY
-@app.route("/history", methods=["GET", "POST"], strict_slashes=False)
-def history():
-    appointments = []
+@app.route("/admin/settings", methods=["POST"])
+def admin_settings():
+    if not session.get("admin"):
+        return redirect("/admin")
 
-    if request.method == "POST":
-        mobile = request.form.get("mobile")
-        code = request.form.get("confirmation_code")
+    f = request.form
 
-        query = supabase.table("appointments").select("*")
+    # Update settings row id=1
+    response = supabase.table("admin_settings") \
+        .update({
+            "doctor_whatsapp": f.get("doctor_whatsapp"),
+            "upi_link": f.get("upi_link"),
+            "default_amount": int(f.get("default_amount") or 0),
+            "followup_amount": int(f.get("followup_amount") or 0),
+            "default_meeting_link": f.get("default_meeting_link")
+        }) \
+        .eq("id", 1) \
+        .execute()
 
-        if mobile:
-            query = query.eq("mobile", mobile)
+    if response.data is None:
+        flash("Failed to update settings", "admin-error")
+    else:
+        flash("Settings updated successfully", "admin-info")
 
-        if code:
-            query = query.ilike("confirmation_code", f"%{code}%")
+    return redirect("/admin/dashboard")
 
-        response = query.order("created_at", desc=True).execute()
-
-        appointments = response.data if response.data else []
-
-    return render_template("history.html", appointments=appointments)
 
 
 @app.route("/history/<code>")
@@ -161,7 +166,7 @@ def history_detail(code):
         .order("uploaded_at", desc=True) \
         .execute().data
     return render_template(
-        "history_detail.html",
+        "history.html",
         appt=appt,
         reports=reports
     )
@@ -171,7 +176,7 @@ def admin_history():
     if not session.get("admin"):
         return redirect("/admin")
 
-    appointments = []
+    patients = []
     search_value = ""
 
     if request.method == "POST":
@@ -186,22 +191,31 @@ def admin_history():
                 .order("created_at", desc=True)
                 .execute()
             )
-        else:
-            response = (
-                supabase
-                .table("appointments")
-                .select("*")
-                .order("created_at", desc=True)
-                .execute()
-            )
 
-        appointments = response.data or []
+            rows = response.data or []
+
+            # GROUP BY MOBILE
+            grouped = {}
+            for row in rows:
+                mobile = row["mobile"]
+
+                if mobile not in grouped:
+                    grouped[mobile] = {
+                        "name": row["patient_name"],
+                        "mobile": mobile,
+                        "appointments": []
+                    }
+
+                grouped[mobile]["appointments"].append(row)
+
+            patients = list(grouped.values())
 
     return render_template(
         "admin_history.html",
-        appointments=appointments,
+        patients=patients,
         search_value=search_value
     )
+
 
 
 
@@ -461,11 +475,18 @@ def admin_dashboard():
 @app.route("/admin", methods=["GET", "POST"])
 def admin_login():
     if request.method == "POST":
-        if request.form["username"] == "admin" and request.form["password"] == "admin123":
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        if username == "admin" and password == "admin123":
             session["admin"] = True
+            flash("Login successful", "admin-info")
             return redirect("/admin/dashboard")
-        flash("Invalid credentials", "admin-error")
+
+        flash("Invalid username or password", "admin-error")
+
     return render_template("admin_login.html")
+
 
 # ==============================
 # ADD SLOT

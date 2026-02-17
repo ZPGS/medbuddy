@@ -12,9 +12,7 @@
 
 <!-- ===== HEADER ===== -->
 <header class="admin-header">
-  <div class="header-left"></div>
   <div class="header-center">Patient Appointment History</div>
-  <div class="header-right"></div>
 </header>
 
 <!-- ===== MAIN ===== -->
@@ -22,13 +20,29 @@
 
   <div class="container history-container">
 
-    <!-- ===== SEARCH ===== -->
-    <form method="post" class="history-search">
-  <input name="search"
-         placeholder="Search by Mobile or Name"
-         value="{{ search_value or '' }}"
-         required>
-  <button type="submit">Search</button>
+    <!-- ===== SEARCH BAR ===== -->
+    <div class="history-search-wrapper">
+      <form method="post" class="history-search">
+
+  <div class="history-search-row">
+    
+    <input name="search"
+           type="text"
+           placeholder="Search by Mobile or Name"
+           value="{{ search_value or '' }}"
+           required
+           class="search-input">
+
+    <button type="submit" class="primary-btn">
+      Search
+    </button>
+
+    <a href="/admin/dashboard" class="secondary-btn back-btn">
+      Back
+    </a>
+
+  </div>
+
 </form>
 
 
@@ -62,6 +76,7 @@
                 <th>Status</th>
                 <th>Fee</th>
                 <th>PDF</th>
+                <th>Reports</th>
               </tr>
             </thead>
             <tbody>
@@ -70,23 +85,35 @@
                 <td>{{ a.confirmation_code }}</td>
                 <td>{{ a.appointment_date }}</td>
                 <td>{{ a.slot_time }}</td>
+
                 <td>
                   <span class="consult-badge {{ a.consultation_type }}">
                     {{ a.consultation_type }}
                   </span>
                 </td>
+
                 <td>
                   <span class="status {{ a.status }}">
                     {{ a.status }}
                   </span>
                 </td>
+
                 <td>₹{{ a.amount }}</td>
+
                 <td>
                   <a href="/appointment/pdf/{{ a.confirmation_code }}"
                      class="secondary-btn small">
                      PDF
                   </a>
                 </td>
+
+                <td>
+                  <a href="/admin/reports/{{ a.confirmation_code }}"
+                     class="secondary-btn small">
+                     📁
+                  </a>
+                </td>
+
               </tr>
               {% endfor %}
             </tbody>
@@ -96,7 +123,7 @@
       </div>
       {% endfor %}
 
-    {% elif search %}
+    {% elif search_value %}
       <div class="empty-state">
         No appointment history found.
       </div>
@@ -105,6 +132,7 @@
   </div>
 
 </main>
+
 <!-- ===== FOOTER ===== -->
 <footer class="footer">
   © 2026 Harmony HomeoCare • Admin Panel
